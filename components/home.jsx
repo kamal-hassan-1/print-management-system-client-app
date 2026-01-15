@@ -1,6 +1,8 @@
-import { ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Dimensions, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { colors } from "../constants/colors";
+
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
 const LandingPage = () => {
 	return (
@@ -16,55 +18,54 @@ const LandingPage = () => {
 				showsVerticalScrollIndicator={false}>
 				{/* Top Cards Section */}
 				<View style={styles.topCardsContainer}>
-					{/* Current Balance Card */}
-					<View style={styles.balanceCard}>
-						<View style={styles.balanceContent}>
-							<View>
-								<Text style={styles.balanceLabel}>Current Balance</Text>
-								<Text style={styles.balanceAmount}>Rs. 0</Text>
-							</View>
-
-							{/* Mastercard Logo and Arrow */}
-							<View style={styles.balanceFooter}>
-								<View style={styles.mastercardLogo}>
-									<View style={[styles.mastercardCircle, { backgroundColor: colors.mastercardRed, zIndex: 2 }]} />
-									<View style={[styles.mastercardCircle, { backgroundColor: colors.mastercardOrange, marginLeft: -18, zIndex: 1 }]} />
+					<View style={styles.cardsRow}>
+						{/* Current Balance Card */}
+						<View style={styles.balanceCard}>
+							<View style={styles.balanceContent}>
+								<View>
+									<Text style={styles.balanceLabel}>Current Balance</Text>
+									<Text style={styles.balanceAmount}>Rs. 0</Text>
 								</View>
 
-								<TouchableOpacity style={styles.arrowButton}>
-									<Text style={styles.arrowText}>→</Text>
-								</TouchableOpacity>
+								{/* Arrow */}
+								<View style={styles.balanceFooter}>
+									<TouchableOpacity style={styles.arrowButton}>
+										<Text style={styles.arrowText}>→</Text>
+									</TouchableOpacity>
+								</View>
 							</View>
 						</View>
-					</View>
 
-					{/* Action Cards Row */}
-					<View style={styles.actionCardsRow}>
-						{/* Credit Wallet Card */}
-						<TouchableOpacity style={[styles.actionCard, styles.creditWalletCard]}>
-							<View style={styles.actionCardIcon}>
-								<Text style={styles.iconText}>↓</Text>
-							</View>
-							<Text style={styles.actionCardText}>Credit{"\n"}Wallet</Text>
-						</TouchableOpacity>
+						{/* Action Cards Column */}
+						<View style={styles.actionCardsColumn}>
+							{/* Load Money Card */}
+							<TouchableOpacity style={[styles.actionCard, styles.creditWalletCard]}>
+								<View style={styles.actionCardIcon}>
+									<Text style={styles.iconText}>↓</Text>
+								</View>
+								<Text style={styles.actionCardText}>Load{"\n"}Money</Text>
+							</TouchableOpacity>
 
-						{/* New Print Request Card */}
-						<TouchableOpacity style={[styles.actionCard, styles.printRequestCard]}>
-							<View style={styles.actionCardIcon}>
-								<Text style={styles.iconText}>↗</Text>
-							</View>
-							<Text style={styles.actionCardText}>New Print{"\n"}Request</Text>
-						</TouchableOpacity>
+							{/* Send & Request Card */}
+							<TouchableOpacity style={[styles.actionCard, styles.printRequestCard]}>
+								<Text style={styles.actionCardText}>Send &{"\n"}Request</Text>
+								<View style={styles.actionCardIconRight}>
+									<Text style={styles.iconText}>↗</Text>
+								</View>
+							</TouchableOpacity>
+						</View>
 					</View>
 				</View>
 
 				{/* Transaction History */}
 				<View style={styles.transactionsContainer}>
-					{/* Dec 31, 2025 Section */}
+					{/* Jan 15, 2025 Section */}
 					<View style={styles.dateSection}>
 						<View style={styles.dateHeader}>
-							<Text style={styles.dateText}>Dec 31, 2025</Text>
-							<Text style={[styles.dateSummary, { color: colors.primary }]}>- Rs. 1,043</Text>
+							{/* Date header */}
+							<Text style={styles.dateText}>Jan 15, 2025</Text>
+							{/* date ke sath jo sadapay me uss din ka net hota */}
+							<Text style={styles.dateSummary}>- Rs. 1353</Text>
 						</View>
 
 						{/* Transaction 1 */}
@@ -74,62 +75,11 @@ const LandingPage = () => {
 									<Text style={{ color: colors.expense, fontSize: 20 }}>↗</Text>
 								</View>
 								<View>
-									<Text style={styles.transactionName}>KAMAL HASSAN</Text>
+									<Text style={styles.transactionName}>PSO</Text>
 									<Text style={styles.transactionTime}>3:57 PM</Text>
 								</View>
 							</View>
 							<Text style={styles.transactionAmount}>Rs. 1,353</Text>
-						</TouchableOpacity>
-
-						{/* Transaction 2 */}
-						<TouchableOpacity style={styles.transactionCard}>
-							<View style={styles.transactionLeft}>
-								<View style={[styles.transactionIcon, { backgroundColor: colors.incomeBackground }]}>
-									<Text style={{ color: colors.income, fontSize: 20 }}>↙</Text>
-								</View>
-								<View>
-									<Text style={styles.transactionName}>HAMZA</Text>
-									<Text style={styles.transactionTime}>8:12 AM</Text>
-								</View>
-							</View>
-							<Text style={[styles.transactionAmount, { color: colors.income }]}>+ Rs. 310</Text>
-						</TouchableOpacity>
-					</View>
-
-					{/* Dec 26, 2025 Section */}
-					<View style={styles.dateSection}>
-						<View style={styles.dateHeader}>
-							<Text style={styles.dateText}>Dec 26, 2025</Text>
-							<Text style={[styles.dateSummary, { color: colors.income }]}>+ Rs. 1,043</Text>
-						</View>
-
-						{/* Transaction 3 */}
-						<TouchableOpacity style={styles.transactionCard}>
-							<View style={styles.transactionLeft}>
-								<View style={[styles.transactionIcon, { backgroundColor: colors.merchantBackground }]}>
-									<Text style={{ color: colors.merchantIcon, fontSize: 20 }}>🏪</Text>
-								</View>
-								<View style={styles.transactionInfo}>
-									<Text style={styles.transactionName}>N And H Petroleum Pv</Text>
-									<Text style={styles.transactionTime}>Islamabad Pak</Text>
-									<Text style={styles.transactionTime}>2:50 PM</Text>
-								</View>
-							</View>
-							<Text style={styles.transactionAmount}>Rs. 350</Text>
-						</TouchableOpacity>
-
-						{/* Transaction 4 */}
-						<TouchableOpacity style={styles.transactionCard}>
-							<View style={styles.transactionLeft}>
-								<View style={[styles.transactionIcon, { backgroundColor: colors.merchantBackground }]}>
-									<Text style={{ color: colors.merchantIcon, fontSize: 20 }}>🛒</Text>
-								</View>
-								<View>
-									<Text style={styles.transactionName}>Mine Save Mart Islamabad Pak</Text>
-									<Text style={styles.transactionTime}>3:43 PM</Text>
-								</View>
-							</View>
-							<Text style={styles.transactionAmount}>Rs. 607</Text>
 						</TouchableOpacity>
 					</View>
 				</View>
@@ -148,14 +98,7 @@ const LandingPage = () => {
 					<View style={styles.navIconContainer}>
 						<Text style={{ fontSize: 20 }}>💳</Text>
 					</View>
-					<Text style={[styles.navLabel, styles.navLabelInactive]}>Payments</Text>
-				</TouchableOpacity>
-
-				<TouchableOpacity style={styles.navItem}>
-					<View style={styles.navIconContainer}>
-						<Text style={{ fontSize: 20 }}>⊞</Text>
-					</View>
-					<Text style={[styles.navLabel, styles.navLabelInactive]}>Scan QR</Text>
+					<Text style={[styles.navLabel, styles.navLabelInactive]}>Print History</Text>
 				</TouchableOpacity>
 
 				<TouchableOpacity style={styles.navItem}>
@@ -178,19 +121,28 @@ const styles = StyleSheet.create({
 		flex: 1,
 	},
 	scrollContent: {
-		paddingBottom: 100,
+		paddingBottom: 0,
+		flexGrow: 1,
 	},
 
 	// Top Cards Section
 	topCardsContainer: {
 		padding: 20,
+		maxWidth: 600, // Max width for tablets
+		alignSelf: "center",
+		width: "100%",
+	},
+	cardsRow: {
+		flexDirection: "row",
+		gap: 16,
+		height: Math.min(SCREEN_HEIGHT * 0.35, 300), // 35% of screen height, max 300
+		minHeight: 240, // Minimum height for small devices
 	},
 	balanceCard: {
+		flex: 1,
 		backgroundColor: colors.primary,
 		borderRadius: 24,
-		padding: 32,
-		minHeight: 280,
-		marginBottom: 16,
+		padding: 28,
 		shadowColor: colors.shadowPrimary,
 		shadowOffset: { width: 0, height: 8 },
 		shadowOpacity: 0.3,
@@ -210,24 +162,14 @@ const styles = StyleSheet.create({
 		letterSpacing: 0.3,
 	},
 	balanceAmount: {
-		fontSize: 64,
+		fontSize: Math.min(SCREEN_WIDTH * 0.16, 52), // Scale with screen, max 60
 		fontWeight: "700",
 		color: colors.cardBackground,
 		letterSpacing: -2,
 	},
 	balanceFooter: {
 		flexDirection: "row",
-		justifyContent: "space-between",
-		alignItems: "center",
-	},
-	mastercardLogo: {
-		flexDirection: "row",
-		alignItems: "center",
-	},
-	mastercardCircle: {
-		width: 36,
-		height: 36,
-		borderRadius: 18,
+		justifyContent: "flex-end",
 	},
 	arrowButton: {
 		width: 48,
@@ -243,16 +185,15 @@ const styles = StyleSheet.create({
 		fontWeight: "600",
 	},
 
-	// Action Cards
-	actionCardsRow: {
-		flexDirection: "row",
+	// Action Cards Column
+	actionCardsColumn: {
+		flex: 1,
 		gap: 16,
 	},
 	actionCard: {
 		flex: 1,
 		borderRadius: 24,
-		padding: 28,
-		minHeight: 180,
+		padding: 24,
 		justifyContent: "space-between",
 		shadowOffset: { width: 0, height: 8 },
 		shadowOpacity: 0.3,
@@ -268,29 +209,44 @@ const styles = StyleSheet.create({
 		shadowColor: colors.shadowPrintRequest,
 	},
 	actionCardIcon: {
-		width: 48,
-		height: 48,
+		width: 44,
+		height: 44,
 		borderRadius: 12,
 		backgroundColor: colors.cardOverlay,
 		justifyContent: "center",
 		alignItems: "center",
 	},
+	actionCardIconRight: {
+		width: 44,
+		height: 44,
+		borderRadius: 12,
+		backgroundColor: colors.cardOverlay,
+		justifyContent: "center",
+		alignItems: "center",
+		alignSelf: "flex-end",
+	},
 	iconText: {
-		fontSize: 24,
+		fontSize: 22,
 		color: colors.cardBackground,
 		fontWeight: "600",
 	},
 	actionCardText: {
-		fontSize: 22,
+		fontSize: 18,
 		fontWeight: "600",
 		color: colors.cardBackground,
-		lineHeight: 28,
+		lineHeight: 26,
 	},
 
 	// Transactions Section
 	transactionsContainer: {
+		backgroundColor: colors.cardBackground,
+		borderTopLeftRadius: 24,
+		borderTopRightRadius: 24,
 		paddingHorizontal: 20,
+		paddingTop: 24,
+		paddingBottom: 100, // Space for bottom navigation
 		marginTop: 12,
+		flex: 1,
 	},
 	dateSection: {
 		marginBottom: 24,
@@ -303,28 +259,28 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 4,
 	},
 	dateText: {
-		fontSize: 32,
+		fontSize: 28,
 		fontWeight: "700",
 		color: colors.textPrimary,
 		letterSpacing: -0.5,
 	},
 	dateSummary: {
-		fontSize: 16,
-		fontWeight: "500",
+		fontSize: 14,
+		fontWeight: "400",
+		color: colors.textSecondary,
+		opacity: 0.6,
 	},
 	transactionCard: {
-		backgroundColor: colors.cardBackground,
-		borderRadius: 16,
-		padding: 20,
-		marginBottom: 12,
+		backgroundColor: "transparent",
+		borderRadius: 0,
+		padding: 16,
+		paddingVertical: 12,
+		marginBottom: 0,
 		flexDirection: "row",
 		justifyContent: "space-between",
 		alignItems: "center",
-		shadowColor: colors.shadowLight,
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 1,
-		shadowRadius: 8,
-		elevation: 2,
+		borderBottomWidth: 1,
+		borderBottomColor: colors.borderLight,
 	},
 	transactionLeft: {
 		flexDirection: "row",
@@ -333,9 +289,9 @@ const styles = StyleSheet.create({
 		flex: 1,
 	},
 	transactionIcon: {
-		width: 48,
-		height: 48,
-		borderRadius: 12,
+		width: 40,
+		height: 40,
+		borderRadius: 10,
 		justifyContent: "center",
 		alignItems: "center",
 	},
@@ -343,19 +299,19 @@ const styles = StyleSheet.create({
 		flex: 1,
 	},
 	transactionName: {
-		fontSize: 16,
-		fontWeight: "600",
+		fontSize: 15,
+		fontWeight: "500",
 		color: colors.textPrimary,
-		marginBottom: 4,
+		marginBottom: 2,
 	},
 	transactionTime: {
-		fontSize: 14,
+		fontSize: 13,
 		color: colors.textSecondary,
-		opacity: 0.7,
+		opacity: 0.6,
 	},
 	transactionAmount: {
-		fontSize: 18,
-		fontWeight: "600",
+		fontSize: 16,
+		fontWeight: "500",
 		color: colors.textPrimary,
 	},
 
@@ -407,5 +363,4 @@ const styles = StyleSheet.create({
 		color: colors.navInactive,
 	},
 });
-
 export default LandingPage;
