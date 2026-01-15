@@ -8,49 +8,63 @@ The app uses a modern, professional color scheme stored in `colors.js`:
 
 ### Primary Colors
 
-1. **#1A1F36** - Deep navy blue (balance card, active navigation)
-2. **#F8F9FB** - Very light grayish-blue (background)
-3. **#3B82F6** - Vibrant blue (Load Money card)
-4. **#8B5CF6** - Rich purple (New Print card)
+1. **#00D9A3** - Vibrant mint/turquoise green (balance card - "minty front")
+2. **#3B9EFF** - Bright sky blue (Load Money card)
+3. **#FF8B7B** - Coral/peachy pink (Send & Request card - "peachy back")
+4. **#F7F8FA** - Very light gray (background)
 5. **#FFFFFF** - Pure white (cards, containers)
 
 See the full color theme description at the end of this document.
 
-### **Background Colors**
+### **Primary Brand Colors**
 
-- **App Background**: `#F8F9FB` - Very light grayish-blue (clean and modern)
-- **Card Background**: `#FFFFFF` - Pure white
+#### **Balance Card - "Minty Front"** 🟢
 
-### **Balance Card**
-
-- **Primary**: `#1A1F36` - Deep navy blue (dark, professional, bold)
-- **Primary Light**: `#2D3348` - Lighter navy variation
+- **Primary**: `#00D9A3` - Vibrant turquoise/mint green (SadaPay's signature color!)
+- **Light**: `#1DE0AD` - Lighter mint variation
+- **Dark**: `#00C793` - Deeper mint shade
 
 ### **Action Buttons** (Bold & Vibrant!)
 
-- **Load Money**: `#3B82F6` - Vibrant blue (stands out beautifully)
-- **New Print**: `#8B5CF6` - Rich purple (modern and eye-catching)
+#### **Load Money - Sky Blue** 🔵
+
+- **Primary**: `#3B9EFF` - Bright, friendly sky blue
+- **Dark**: `#2A8AEF` - Deeper blue for hover/press states
+
+#### **Send & Request - "Peachy Back"** 🍑
+
+- **Primary**: `#FF8B7B` - Warm coral/peachy pink (SadaPay's signature accent)
+- **Dark**: `#FF7B6B` - Deeper coral for hover/press states
+
+### **Background Colors**
+
+- **App Background**: `#F7F8FA` - Very light gray (clean, minimal, approachable)
+- **Card Background**: `#FFFFFF` - Pure white
 
 ### **Text Colors**
 
-- **Primary Text**: `#1A1F36` - Deep navy (excellent readability)
-- **Secondary Text**: `#6B7280` - Medium gray (subtle but clear)
+- **Primary Text**: `#1A1F36` - Deep navy/black (excellent readability)
+- **Secondary Text**: `#8F9BB3` - Soft gray (perfect for timestamps and subtitles)
 
 ### **Transaction Colors**
 
-- **Income**: `#10B981` - Green (positive transactions)
-- **Expense**: `#EF4444` - Red (spending/outflows)
-- **Income Background**: `#D1FAE5` - Light green tint
-- **Expense Background**: `#FEE2E2` - Light red tint
+- **Income**: `#00C896` - Mint green (matches brand, positive feeling)
+- **Expense**: `#FF6B8A` - Coral pink (warm, friendly reminder of spending)
+- **Income Background**: `#D4F8ED` - Light mint tint for income transactions
+- **Expense Background**: `#FFE5E5` - Light coral tint for expense transactions
+- **Merchant Background**: `#E3F2FD` - Light blue for merchant transactions
+- **Merchant Icon**: `#3B9EFF` - Sky blue for merchant icons
 
 ### **Navigation**
 
-- **Active**: `#1A1F36` - Deep navy (clear indication)
-- **Inactive**: `#9CA3AF` - Light gray (subtle)
+- **Active**: `#FF8B7B` - Coral pink (matches Send & Request card)
+- **Inactive**: `#C5CEE0` - Light gray (subtle, not distracting)
 
 ### **Border & Shadow Colors**
 
-- **Border Light**: `rgba(226, 232, 240, 0.8)` - Subtle borders
-- **Shadow Light**: `rgba(15, 23, 42, 0.04)` - Soft shadows
-- **Shadow Medium**: `rgba(15, 23, 42, 0.08)` - Medium shadows
-- **Shadow Primary**: `rgba(26, 31, 54, 0.15)` - Card shadows
+- **Border Light**: `rgba(228, 233, 242, 0.8)` - Subtle, clean borders
+- **Shadow Light**: `rgba(143, 155, 179, 0.08)` - Soft shadows
+- **Shadow Medium**: `rgba(143, 155, 179, 0.12)` - Medium depth shadows
+- **Shadow Primary**: `rgba(0, 217, 163, 0.25)` - Mint green glow for balance card
+- **Shadow Credit Wallet**: `rgba(59, 158, 255, 0.25)` - Blue glow for Load Money
+- **Shadow Print Request**: `rgba(255, 139, 123, 0.25)` - Coral glow for Send & Request

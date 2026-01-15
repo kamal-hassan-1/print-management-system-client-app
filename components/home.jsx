@@ -43,12 +43,12 @@ const LandingPage = () => {
 								<View style={styles.actionCardIcon}>
 									<Text style={styles.iconText}>↓</Text>
 								</View>
-								<Text style={styles.actionCardText}>Load{"\n"}Money</Text>
+								<Text style={styles.actionCardText}>Credit Wallet</Text>
 							</TouchableOpacity>
 
 							{/* Send & Request Card */}
 							<TouchableOpacity style={[styles.actionCard, styles.printRequestCard]}>
-								<Text style={styles.actionCardText}>Send &{"\n"}Request</Text>
+								<Text style={styles.actionCardText}>New Print</Text>
 								<View style={styles.actionCardIconRight}>
 									<Text style={styles.iconText}>↗</Text>
 								</View>
@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 		backgroundColor: colors.primary,
 		borderRadius: 24,
-		padding: 28,
+		padding: 22,
 		shadowColor: colors.shadowPrimary,
 		shadowOffset: { width: 0, height: 8 },
 		shadowOpacity: 0.3,
@@ -193,7 +193,7 @@ const styles = StyleSheet.create({
 	actionCard: {
 		flex: 1,
 		borderRadius: 24,
-		padding: 24,
+		padding: 20,
 		justifyContent: "space-between",
 		shadowOffset: { width: 0, height: 8 },
 		shadowOpacity: 0.3,
@@ -234,7 +234,7 @@ const styles = StyleSheet.create({
 		fontSize: 18,
 		fontWeight: "600",
 		color: colors.cardBackground,
-		lineHeight: 26,
+		lineHeight: 22,
 	},
 
 	// Transactions Section

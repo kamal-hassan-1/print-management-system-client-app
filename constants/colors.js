@@ -1,48 +1,57 @@
+// SadaPay Official Color Theme
+// Based on SadaPay's "minty front and peachy back" brand colors
+// Colors extracted from official SadaPay app interface
+
 export const colors = {
-	// Primary Colors
-	primary: "#1A1F36", // Deep navy blue for balance card
-	primaryLight: "#2D3348",
+	// Primary Colors - SadaPay Mint Green
+	primary: "#00D9A3", // Vibrant mint/turquoise green (balance card)
+	primaryLight: "#1DE0AD",
+	primaryDark: "#00C793",
 
 	// Background Colors
-	background: "#F8F9FB", // Very light grayish-blue
+	background: "#F7F8FA", // Very light gray (almost white)
 	cardBackground: "#FFFFFF",
 
 	// Text Colors
-	textPrimary: "#1A1F36", // Deep navy
-	textSecondary: "#6B7280", // Medium gray
+	textPrimary: "#1A1F36", // Deep navy/black for main text
+	textSecondary: "#8F9BB3", // Light gray for secondary text
 
 	// Action Card Colors
-	creditWallet: "#3B82F6", // Vibrant blue
-	creditWalletDark: "#2563EB",
+	creditWallet: "#3B9EFF", // Bright sky blue (Load Money)
+	creditWalletDark: "#2A8AEF",
 
-	printRequest: "#8B5CF6", // Rich purple
-	printRequestDark: "#7C3AED",
+	printRequest: "#FF8B7B", // Coral/peachy pink (Send & Request)
+	printRequestDark: "#FF7B6B",
 
 	// Transaction Colors
-	income: "#10B981", // Green
-	expense: "#EF4444", // Red
+	income: "#00C896", // Mint green (matching brand)
+	expense: "#FF6B8A", // Coral pink for expenses
 
 	// Accent Colors
-	incomeBackground: "#D1FAE5",
-	expenseBackground: "#FEE2E2",
-	merchantBackground: "#E0E7FF",
-	merchantIcon: "#6366F1",
+	incomeBackground: "#D4F8ED", // Light mint background
+	expenseBackground: "#FFE5E5", // Light coral background
+	merchantBackground: "#E3F2FD", // Light blue background
+	merchantIcon: "#3B9EFF",
 
 	// Card Elements
 	cardOverlay: "rgba(255, 255, 255, 0.2)",
-	cardOverlayHover: "rgba(180, 29, 29, 0.3)",
+	cardOverlayHover: "rgba(255, 255, 255, 0.3)",
 
 	// Navigation
-	navActive: "#1A1F36",
-	navInactive: "#9CA3AF",
+	navActive: "#FF8B7B", // Coral pink for active state
+	navInactive: "#C5CEE0", // Light gray for inactive
+
+	// Mastercard Colors (as per original)
+	mastercardRed: "#eb001b",
+	mastercardOrange: "#ff5f00",
 
 	// Shadow Colors
-	shadowLight: "rgba(15, 23, 42, 0.04)",
-	shadowMedium: "rgba(15, 23, 42, 0.08)",
-	shadowPrimary: "rgba(26, 31, 54, 0.15)",
-	shadowCreditWallet: "rgba(59, 130, 246, 0.25)",
-	shadowPrintRequest: "rgba(139, 92, 246, 0.25)",
+	shadowLight: "rgba(143, 155, 179, 0.08)",
+	shadowMedium: "rgba(143, 155, 179, 0.12)",
+	shadowPrimary: "rgba(0, 217, 163, 0.25)", // Mint shadow
+	shadowCreditWallet: "rgba(59, 158, 255, 0.25)", // Blue shadow
+	shadowPrintRequest: "rgba(255, 139, 123, 0.25)", // Coral shadow
 
 	// Border Colors
-	borderLight: "rgba(226, 232, 240, 0.8)",
+	borderLight: "rgba(228, 233, 242, 0.8)",
 };
