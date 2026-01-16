@@ -23,13 +23,7 @@ export const colors = {
 	printRequest: "#FF8B7B", // Coral/peachy pink (Send & Request)
 	printRequestDark: "#FF7B6B",
 
-	// Transaction Colors
-	income: "#00C896", // Mint green (matching brand)
-	expense: "#FF6B8A", // Coral pink for expenses
-
 	// Accent Colors
-	incomeBackground: "#D4F8ED", // Light mint background
-	expenseBackground: "#FFE5E5", // Light coral background
 	merchantBackground: "#E3F2FD", // Light blue background
 	merchantIcon: "#3B9EFF",
 
@@ -40,10 +34,6 @@ export const colors = {
 	// Navigation
 	navActive: "#FF8B7B", // Coral pink for active state
 	navInactive: "#858b96", // Light gray for inactive
-
-	// Mastercard Colors (as per original)
-	mastercardRed: "#eb001b",
-	mastercardOrange: "#ff5f00",
 
 	// Shadow Colors
 	shadowLight: "rgba(143, 155, 179, 0.08)",
