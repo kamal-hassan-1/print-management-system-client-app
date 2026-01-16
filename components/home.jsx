@@ -1,7 +1,7 @@
+import { Feather, Ionicons } from "@expo/vector-icons";
 import { Dimensions, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { colors } from "../constants/colors";
-
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
 const LandingPage = () => {
@@ -19,7 +19,7 @@ const LandingPage = () => {
 				<View style={styles.topCardsContainer}>
 					<View style={styles.cardsRow}>
 						{/* Current Balance Card */}
-						<View style={styles.balanceCard}>
+						<TouchableOpacity style={styles.balanceCard}>
 							<View style={styles.balanceContent}>
 								<View>
 									<Text style={styles.balanceLabel}>Current Balance</Text>
@@ -28,19 +28,27 @@ const LandingPage = () => {
 
 								{/* Arrow */}
 								<View style={styles.balanceFooter}>
-									<TouchableOpacity style={styles.arrowButton}>
-										<Text style={styles.arrowText}>→</Text>
-									</TouchableOpacity>
+									<View style={styles.arrowButton}>
+										<Feather
+											name="arrow-right"
+											size={24}
+											color={colors.cardBackground}
+										/>
+									</View>
 								</View>
 							</View>
-						</View>
+						</TouchableOpacity>
 
 						{/* Action Cards Column */}
 						<View style={styles.actionCardsColumn}>
 							{/* Load Money Card */}
 							<TouchableOpacity style={[styles.actionCard, styles.creditWalletCard]}>
 								<View style={styles.actionCardIcon}>
-									<Text style={styles.iconText}>↓</Text>
+									<Feather
+										name="arrow-down"
+										size={18}
+										color={colors.cardBackground}
+									/>
 								</View>
 								<Text style={styles.actionCardText}>Credit Wallet</Text>
 							</TouchableOpacity>
@@ -49,7 +57,11 @@ const LandingPage = () => {
 							<TouchableOpacity style={[styles.actionCard, styles.printRequestCard]}>
 								<Text style={styles.actionCardText}>New Print</Text>
 								<View style={styles.actionCardIconRight}>
-									<Text style={styles.iconText}>↗</Text>
+									<Feather
+										name="arrow-up-right"
+										size={18}
+										color={colors.cardBackground}
+									/>
 								</View>
 							</TouchableOpacity>
 						</View>
@@ -71,7 +83,11 @@ const LandingPage = () => {
 						<TouchableOpacity style={styles.transactionCard}>
 							<View style={styles.transactionLeft}>
 								<View style={[styles.transactionIcon, { backgroundColor: colors.expenseBackground }]}>
-									<Text style={{ color: colors.expense, fontSize: 20 }}>↗</Text>
+									<Feather
+										name="arrow-up-right"
+										size={18}
+										color={colors.expense}
+									/>
 								</View>
 								<View>
 									<Text style={styles.transactionName}>PSO</Text>
@@ -88,21 +104,33 @@ const LandingPage = () => {
 			<View style={styles.bottomNav}>
 				<TouchableOpacity style={styles.navItem}>
 					<View style={[styles.navIconContainer, styles.navIconActive]}>
-						<Text style={{ fontSize: 20 }}>🏠</Text>
+						<Ionicons
+							name="home"
+							size={20}
+							color={colors.cardBackground}
+						/>
 					</View>
 					<Text style={[styles.navLabel, styles.navLabelActive]}>Home</Text>
 				</TouchableOpacity>
 
 				<TouchableOpacity style={styles.navItem}>
 					<View style={styles.navIconContainer}>
-						<Text style={{ fontSize: 20 }}>💳</Text>
+						<Ionicons
+							name="receipt-outline"
+							size={20}
+							color={colors.navInactive}
+						/>
 					</View>
 					<Text style={[styles.navLabel, styles.navLabelInactive]}>Print History</Text>
 				</TouchableOpacity>
 
 				<TouchableOpacity style={styles.navItem}>
 					<View style={styles.navIconContainer}>
-						<Text style={{ fontSize: 20 }}>👤</Text>
+						<Ionicons
+							name="person-outline"
+							size={20}
+							color={colors.navInactive}
+						/>
 					</View>
 					<Text style={[styles.navLabel, styles.navLabelInactive]}>Profile</Text>
 				</TouchableOpacity>
@@ -326,7 +354,7 @@ const styles = StyleSheet.create({
 		flexDirection: "row",
 		justifyContent: "space-around",
 		alignItems: "center",
-		paddingTop: 12,
+		paddingTop: 10,
 		paddingBottom: 28,
 		shadowColor: colors.shadowMedium,
 		shadowOffset: { width: 0, height: -4 },

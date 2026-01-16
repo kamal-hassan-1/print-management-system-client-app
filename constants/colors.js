@@ -39,7 +39,7 @@ export const colors = {
 
 	// Navigation
 	navActive: "#FF8B7B", // Coral pink for active state
-	navInactive: "#C5CEE0", // Light gray for inactive
+	navInactive: "#858b96", // Light gray for inactive
 
 	// Mastercard Colors (as per original)
 	mastercardRed: "#eb001b",
