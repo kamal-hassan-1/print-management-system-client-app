@@ -11,7 +11,6 @@ const LandingPage = () => {
 				barStyle="dark-content"
 				backgroundColor={colors.background}
 			/>
-
 			<ScrollView
 				style={styles.scrollView}
 				contentContainerStyle={styles.scrollContent}
