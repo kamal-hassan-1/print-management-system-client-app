@@ -1,22 +1,15 @@
-import React from "react";
 import { Feather } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import { ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { colors } from "../../constants/colors";
-import { useRouter } from "expo-router";
 
 const Profile = () => {
-
-	const [isLoggedIn, setIsLoggedIn] = React.useState(true);
 	const router = useRouter();
 
 	const handleLogout = () => {
 		console.log("Logout pressed");
-		isLoggedIn = false
-		setIsLoggedIn(isLoggedIn);
 		router.replace("/"); // Navigate to login screen
-
-		
 	};
 
 	return (
