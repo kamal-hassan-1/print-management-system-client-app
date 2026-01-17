@@ -7,12 +7,13 @@ import { useRouter } from "expo-router";
 
 const Profile = () => {
 
-	const [isLoggedIn, setIsLoggedIn] = React.useState(true);	
+	const [isLoggedIn, setIsLoggedIn] = React.useState(true);
 	const router = useRouter();
 
 	const handleLogout = () => {
 		console.log("Logout pressed");
-		setIsLoggedIn(false);
+		isLoggedIn = false
+		setIsLoggedIn(isLoggedIn);
 		router.replace("/"); // Navigate to login screen
 
 		
