@@ -2,9 +2,9 @@ import { Feather } from "@expo/vector-icons";
 import { useMemo, useState } from "react";
 import { Modal, ScrollView, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import TransactionList from "../components/TransactionList";
-import { colors } from "../constants/colors";
-import { mockTransactions } from "../data/mockData";
+import TransactionList from "../../components/TransactionList";
+import { colors } from "../../constants/colors";
+import { mockTransactions } from "../../data/mockData";
 
 const PrintHistory = () => {
 	// Filter states

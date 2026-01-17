@@ -1,8 +1,11 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
-import { colors } from "../constants/colors";
+import { colors } from "../../constants/colors";
 
 export default function Layout() {
+
+	
+
 	return (
 		<Tabs
 			screenOptions={{
@@ -73,6 +76,8 @@ export default function Layout() {
 					),
 				}}
 			/>
+
+			
 		</Tabs>
 	);
 }

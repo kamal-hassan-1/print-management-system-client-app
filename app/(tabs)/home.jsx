@@ -2,9 +2,9 @@ import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { Dimensions, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import TransactionList from "../components/TransactionList";
-import { colors } from "../constants/colors";
-import { mockTransactions } from "../data/mockData";
+import TransactionList from "../../components/TransactionList";
+import { colors } from "../../constants/colors";
+import { mockTransactions } from "../../data/mockData";
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
