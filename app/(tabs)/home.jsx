@@ -71,9 +71,7 @@ const HomePage = () => {
 							<TouchableOpacity
 								style={[styles.actionCard, styles.printRequestCard]}
 								onPress={() => {
-									// Navigate to new print screen
-									console.log("New Print pressed");
-									// router.push('/new-print');
+									router.push("/new-print");
 								}}>
 								<Text style={styles.actionCardText}>New Print</Text>
 								<View style={styles.actionCardIconRight}>

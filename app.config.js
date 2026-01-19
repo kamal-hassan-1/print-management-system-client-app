@@ -1,4 +1,5 @@
-{
+import "dotenv/config";
+export default {
   "expo": {
     "name": "print-management-system-client-app",
     "slug": "print-management-system-client-app",
@@ -54,7 +55,8 @@
       "router": {},
       "eas": {
         "projectId": "8f036921-80b8-45ba-9cfa-120c5411b3a6"
-      }
+      },
+      "apiBaseUrl": process.env.API_BASE_URL,
     }
   }
 }
