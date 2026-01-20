@@ -4,9 +4,7 @@ import { useState } from "react";
 import { Alert, Keyboard, KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-
 const Login = () => {
-
 	const router = useRouter();
 	const [countryCode, setCountryCode] = useState("+92");
 	const [phone, setPhone] = useState("");
@@ -19,7 +17,6 @@ const Login = () => {
 	];
 
 	const handleContinue = () => {
-
 		if (phone.length === 0) {
 			Alert.alert("Please enter a valid phone number.");
 			return;
@@ -30,57 +27,53 @@ const Login = () => {
 
 		// Navigate to the main app (tabs)
 		router.replace("/otp");
-	}
+	};
 
 	const selectCountryCode = (code) => {
 		setCountryCode(code);
 		setShowPicker(false);
-	}
+	};
 
 	// Get the selected country display text with flag
 	const getSelectedCountryDisplay = () => {
-		const selected = countryCodes.find(c => c.value === countryCode);
+		const selected = countryCodes.find((c) => c.value === countryCode);
 		if (selected) {
 			// Extract flag and code (e.g., "🇵🇰 +92" from "🇵🇰 Pakistan +92")
-			const parts = selected.label.split(' ');
+			const parts = selected.label.split(" ");
 			if (parts.length >= 3) {
 				return `${parts[0]} ${parts[parts.length - 1]}`; // Flag + Code
 			}
 			return selected.label;
 		}
 		return countryCode;
-	}
-
+	};
 
 	return (
-		<KeyboardAvoidingView style={{ flex: 1 }} behavior="height">
+		<KeyboardAvoidingView
+			style={{ flex: 1 }}
+			behavior="height">
 			<TouchableWithoutFeedback
 				onPress={() => {
 					Keyboard.dismiss();
 					setShowPicker(false);
 				}}
-				
+				accessible={false}
 			>
 				<SafeAreaView style={styles.container}>
-
-					<Text style={styles.heading}>Let's get started!</Text>
+					<Text style={styles.heading}>Let&apos;s get started!</Text>
 					<Text style={styles.subHeading}>Please enter your mobile number</Text>
 
 					<View style={styles.phoneRow}>
-
 						{/* Country Code */}
 						<View style={styles.countryCodeWrapper}>
 							<TouchableOpacity
 								style={styles.countryBox}
-								onPress={() => setShowPicker(!showPicker)}
-							>
-								<Text style={styles.countryCodeText}>
-									{getSelectedCountryDisplay()}
-								</Text>
-								<Ionicons 
-									name={showPicker ? "chevron-up" : "chevron-down"} 
-									size={18} 
-									color="#000" 
+								onPress={() => setShowPicker(!showPicker)}>
+								<Text style={styles.countryCodeText}>{getSelectedCountryDisplay()}</Text>
+								<Ionicons
+									name={showPicker ? "chevron-up" : "chevron-down"}
+									size={18}
+									color="#000"
 								/>
 							</TouchableOpacity>
 
@@ -90,20 +83,15 @@ const Login = () => {
 									{countryCodes.map((item) => (
 										<TouchableOpacity
 											key={item.value}
-											style={[
-												styles.dropdownOption,
-												countryCode === item.value && styles.dropdownOptionSelected
-											]}
-											onPress={() => selectCountryCode(item.value)}
-										>
-											<Text style={[
-												styles.dropdownOptionText,
-												countryCode === item.value && styles.dropdownOptionTextSelected
-											]}>
-												{item.label}
-											</Text>
+											style={[styles.dropdownOption, countryCode === item.value && styles.dropdownOptionSelected]}
+											onPress={() => selectCountryCode(item.value)}>
+											<Text style={[styles.dropdownOptionText, countryCode === item.value && styles.dropdownOptionTextSelected]}>{item.label}</Text>
 											{countryCode === item.value && (
-												<Ionicons name="checkmark" size={18} color="#FF4F00" />
+												<Ionicons
+													name="checkmark"
+													size={18}
+													color="#FF4F00"
+												/>
 											)}
 										</TouchableOpacity>
 									))}
@@ -123,24 +111,23 @@ const Login = () => {
 								maxLength={15}
 							/>
 						</View>
-
 					</View>
-
 
 					<TouchableOpacity
 						style={[styles.button, phone.length === 0 && styles.buttonDisabled]}
 						disabled={phone.length === 0}
-						onPress={handleContinue}
-					>
+						onPress={handleContinue}>
 						<Text style={styles.buttonText}>Continue</Text>
-						<Ionicons name="arrow-forward" size={20} color="#fff" />
+						<Ionicons
+							name="arrow-forward"
+							size={20}
+							color="#fff"
+						/>
 					</TouchableOpacity>
-
 				</SafeAreaView>
 			</TouchableWithoutFeedback>
 		</KeyboardAvoidingView>
-	)
-
+	);
 };
 
 const styles = StyleSheet.create({
@@ -149,7 +136,6 @@ const styles = StyleSheet.create({
 		backgroundColor: "#FF7F66", // similar to screenshot
 		paddingHorizontal: 20,
 		justifyContent: "center",
-		
 	},
 	heading: {
 		fontSize: 28,
@@ -250,13 +236,6 @@ const styles = StyleSheet.create({
 		color: "#FF4F00",
 		fontWeight: "600",
 	},
-	input: {
-		flex: 1,
-		height: 50,
-		fontSize: 16,
-		marginLeft: 10,
-		color: "#000",
-	},
 	button: {
 		flexDirection: "row",
 		justifyContent: "center",
@@ -277,7 +256,7 @@ const styles = StyleSheet.create({
 		fontSize: 16,
 		marginRight: 10,
 		fontWeight: "bold",
-	}
+	},
 });
 
 export default Login;
