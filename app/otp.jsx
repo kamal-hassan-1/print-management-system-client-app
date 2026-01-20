@@ -120,7 +120,7 @@ const VerifyCode = () => {
 			{/* Instruction with WhatsApp */}
 			<View style={styles.instructionContainer}>
 				<Text style={styles.instructionText}>
-					We've sent it to {formatPhoneNumber(phoneNumber)} via
+					We&apos;ve sent it to {formatPhoneNumber(phoneNumber)} via
 				</Text>
 				<View style={styles.whatsappContainer}>
 					<Ionicons name="logo-whatsapp" size={18} color="#25D366" />
