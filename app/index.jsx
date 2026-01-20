@@ -59,7 +59,7 @@ const Login = () => {
 					Keyboard.dismiss();
 					setShowPicker(false);
 				}}
-				accessible={false}
+				
 			>
 				<SafeAreaView style={styles.container}>
 
