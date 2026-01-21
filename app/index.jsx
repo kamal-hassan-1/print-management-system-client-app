@@ -3,6 +3,7 @@ import { useRouter } from "expo-router";
 import { useState } from "react";
 import { Alert, Keyboard, KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { colors } from "../constants/colors";
 
 const Login = () => {
 	const router = useRouter();
@@ -23,10 +24,35 @@ const Login = () => {
 		}
 
 		// TODO: Implement actual authentication API call here
+		// fetch("https://example.com/api/auth/otp", {
+		// 	method: "POST",
+		// 	headers: {
+		// 		"Content-Type": "application/json",
+		// 	},
+		// 	body: JSON.stringify({ number: countryCode + phone }),
+		// })
+		// 	.then((response) => response.json())
+		// 	.then((data) => {
+		// 		if (data.success) {
+		// 			router.replace("/otp");
+		// 		} else {
+		// 			Alert.alert("Error", "Failed to send OTP. Please try again.");
+		// 		}
+		// 	})
+		// 	.catch((error) => {
+		// 		console.error("Error sending OTP:", error);
+		// 		Alert.alert("Error", "An unexpected error occurred. Please try again.");
+		// 	});
+
+
+
 		console.log("Continue with phone number:", countryCode + phone);
 
 		// Navigate to the main app (tabs)
-		router.replace("/otp");
+		router.replace({
+			pathname: "/otp",
+			params: { phone: countryCode + phone },
+		});
 	};
 
 	const selectCountryCode = (code) => {
@@ -121,7 +147,7 @@ const Login = () => {
 						<Ionicons
 							name="arrow-forward"
 							size={20}
-							color="#fff"
+							color= {colors.textPrimary}
 						/>
 					</TouchableOpacity>
 				</SafeAreaView>
@@ -133,13 +159,13 @@ const Login = () => {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: "#FF7F66", // similar to screenshot
+		backgroundColor: colors.background, // similar to screenshot
 		paddingHorizontal: 20,
 		justifyContent: "center",
 	},
 	heading: {
 		fontSize: 28,
-		color: "#fff",
+		color: colors.textPrimary,
 		fontWeight: "bold",
 		marginBottom: 10,
 		marginTop: 100,
@@ -147,7 +173,7 @@ const styles = StyleSheet.create({
 	},
 	subHeading: {
 		fontSize: 16,
-		color: "#fff",
+		color: colors.textPrimary,
 		marginBottom: 40,
 		marginTop: 5,
 		marginLeft: 5,
@@ -169,7 +195,7 @@ const styles = StyleSheet.create({
 	countryBox: {
 		flexDirection: "row",
 		alignItems: "center",
-		backgroundColor: "#fff",
+		backgroundColor: "rgb(236, 228, 228)",
 		paddingHorizontal: 14,
 		height: 40,
 		borderRadius: 25,
@@ -178,7 +204,7 @@ const styles = StyleSheet.create({
 
 	phoneBox: {
 		flex: 1,
-		backgroundColor: "#fff",
+		backgroundColor: "rgb(236, 228, 228)",
 		height: 40,
 		borderRadius: 25,
 		paddingHorizontal: 10,
@@ -249,10 +275,10 @@ const styles = StyleSheet.create({
 
 	buttonDisabled: {
 		backgroundColor: "#FF7F66",
-		opacity: 0.6,
+		opacity: 1,
 	},
 	buttonText: {
-		color: "#fff",
+		color: colors.textPrimary,
 		fontSize: 16,
 		marginRight: 10,
 		fontWeight: "bold",

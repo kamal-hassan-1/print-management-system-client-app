@@ -3,21 +3,22 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { Alert, Modal, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { colors } from "../constants/colors";
 
 const VerifyCode = () => {
 	const router = useRouter();
 	const params = useLocalSearchParams();
 	const phoneNumber = params.phone || "+92-327-5555555";
-	
+
 	const [codes, setCodes] = useState(["", "", "", "", ""]);
-	const [timer, setTimer] = useState(30); // 30 seconds
+	const [timer, setTimer] = useState(30);
 	const [showErrorModal, setShowErrorModal] = useState(false);
 	const inputRefs = useRef([]);
 
-	// Format phone number for display
+
 	const formatPhoneNumber = (phone) => {
 		if (!phone) return "";
-		// If already formatted, return as is
+
 		if (phone.includes("-")) return phone;
 		// Format: +92-XXX-XXXXXXX
 		if (phone.startsWith("+92")) {
@@ -65,8 +66,43 @@ const VerifyCode = () => {
 		}
 	};
 
+
+
+	// ****** actual verification API call *******
+	// const handleVerify = async (code) => {
+	// 	try {
+	// 		console.log("Verifying code:", code, "for", phoneNumber);
+
+	// 		const response = await fetch("https://example.com/api/auth/verify", {
+	// 			method: "POST",
+	// 			headers: {
+	// 				"Content-Type": "application/json",
+	// 			},
+	// 			body: JSON.stringify({
+	// 				phone: phoneNumber,
+	// 				otp: code,
+	// 			}),
+	// 		});
+
+	// 		const data = await response.json();
+
+	// 		if (response.ok && data.success) {
+	// 			// SUCCESS: Token usually returned here
+	// 			// Example: await saveToken(data.token); 
+	// 			router.replace("/(tabs)/home");
+	// 		} else {
+	// 			// FAILURE: Wrong OTP or expired
+	// 			handleVerificationFailure();
+	// 		}
+	// 	} catch (error) {
+	// 		console.error("Verification API Error:", error);
+	// 		Alert.alert("Connection Error", "Check your internet and try again.");
+	// 	}
+	// };
+
 	const handleVerify = (code) => {
 		// TODO: Implement actual verification API call
+
 		console.log("Verifying code:", code);
 
 		// Simulate verification failure for demo
@@ -106,7 +142,6 @@ const VerifyCode = () => {
 
 	return (
 		<SafeAreaView style={styles.container}>
-			{/* Back Button */}
 			<TouchableOpacity
 				style={styles.backButton}
 				onPress={() => router.back()}
@@ -114,10 +149,10 @@ const VerifyCode = () => {
 				<Ionicons name="arrow-back" size={24} color="#fff" />
 			</TouchableOpacity>
 
-			{/* Title */}
+
 			<Text style={styles.title}>Enter verification code</Text>
 
-			{/* Instruction with WhatsApp */}
+
 			<View style={styles.instructionContainer}>
 				<Text style={styles.instructionText}>
 					We&apos;ve sent it to {formatPhoneNumber(phoneNumber)} via
@@ -128,7 +163,7 @@ const VerifyCode = () => {
 				</View>
 			</View>
 
-			{/* Code Input Fields */}
+
 			<View style={styles.codeContainer}>
 				{codes.map((code, index) => (
 					<TextInput
@@ -146,7 +181,7 @@ const VerifyCode = () => {
 				))}
 			</View>
 
-			{/* Timer and Call/Resend Option */}
+
 			<View style={styles.timerContainer}>
 				{timer > 0 ? (
 					<Text style={styles.timerText}>
@@ -165,7 +200,7 @@ const VerifyCode = () => {
 				)}
 			</View>
 
-			{/* Error Modal */}
+
 			<Modal
 				visible={showErrorModal}
 				transparent={true}
@@ -207,7 +242,7 @@ const VerifyCode = () => {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: "#FF7F66",
+		backgroundColor: colors.background,
 		paddingHorizontal: 20,
 		paddingTop: 20,
 	},
@@ -217,7 +252,7 @@ const styles = StyleSheet.create({
 	},
 	title: {
 		fontSize: 32,
-		color: "#fff",
+		color: colors.textPrimary,
 		fontWeight: "bold",
 		marginBottom: 15,
 	},
@@ -229,7 +264,7 @@ const styles = StyleSheet.create({
 	},
 	instructionText: {
 		fontSize: 16,
-		color: "rgba(255, 255, 255, 0.9)",
+		color: colors.textPrimary,
 		marginRight: 5,
 	},
 	whatsappContainer: {
@@ -239,7 +274,7 @@ const styles = StyleSheet.create({
 	},
 	whatsappText: {
 		fontSize: 16,
-		color: "#fff",
+		color: colors.textPrimary,
 		fontWeight: "600",
 	},
 	codeContainer: {
@@ -252,10 +287,10 @@ const styles = StyleSheet.create({
 		flex: 1,
 		height: 60,
 		borderBottomWidth: 2,
-		borderBottomColor: "#fff",
+		borderBottomColor: "#938b8b",
 		textAlign: "center",
 		fontSize: 32,
-		color: "#fff",
+		color: colors.textPrimary,
 		fontWeight: "600",
 		paddingVertical: 10,
 	},
@@ -265,7 +300,7 @@ const styles = StyleSheet.create({
 	},
 	timerText: {
 		fontSize: 16,
-		color: "#fff",
+		color: colors.textSecondary,
 	},
 	actionContainer: {
 		flexDirection: "row",
@@ -278,7 +313,7 @@ const styles = StyleSheet.create({
 	},
 	resendText: {
 		fontSize: 16,
-		color: "#fff",
+		color: colors.textPrimary,
 		fontWeight: "600",
 		textDecorationLine: "underline",
 	},
@@ -289,7 +324,7 @@ const styles = StyleSheet.create({
 	},
 	callText: {
 		fontSize: 16,
-		color: "#fff",
+		color: colors.textPrimary,
 		fontWeight: "600",
 		textDecorationLine: "underline",
 	},
