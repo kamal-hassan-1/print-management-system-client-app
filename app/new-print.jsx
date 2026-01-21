@@ -53,8 +53,7 @@ const NewPrint = () => {
 
 		const shop = shops.find((s) => s.id === selectedShop);
 		console.log("Continuing with shop:", shop);
-		// Navigate to next step
-		// router.push({ pathname: '/print-options', params: { shopId: selectedShop } });
+		router.push({ pathname: "/upload-document", params: { shopId: selectedShop } });
 	};
 
 	return (
