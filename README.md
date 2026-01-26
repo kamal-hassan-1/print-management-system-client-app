@@ -2,7 +2,7 @@
 
 > **Mobile gateway for automated print queuing system.**
 
-The **ClickPrint** is a React Native (Expo) application designed to eliminate physical queues at print shops. It allows to submit documents digitally, pay via a virtual wallet, and receive real-time updates on their print status. 
+The **ClickPrint** is a React Native (Expo) application designed to eliminate physical queues at print shops. It allows to submit documents digitally, pay via a virtual wallet, and receive real-time updates on their print status. A work in progress.
 
 ## Architecture Role
 
