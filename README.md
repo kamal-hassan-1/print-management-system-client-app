@@ -1,4 +1,4 @@
-# ClickPrint
+# ClickPrint (In progress)
 
 > **Mobile gateway for automated print queuing system.**
 
@@ -11,13 +11,6 @@ This app acts as the **Primary Actor Interface** in a distributed system:
 1. **User:** Uploads PDF and selects specs (Color, Duplex, Pages).
 2. **Client App:** Transmits data to the **Node.js Backend**.
 3. **Status:** Listens via **WebSockets** for updates from the **Desktop Print Agent**.
-
-## Core Modules
-
-- **Auth Module:**
-- **Document Engine:**
-- **Specification Logic:**
-- **Real-time Tracker:**
 
 ## Tech Stack
 
