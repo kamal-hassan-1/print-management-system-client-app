@@ -8,6 +8,16 @@ import { colors } from "../constants/colors";
 
 const API_BASE_URL = config.apiBaseUrl;
 
+//isse hatana he, yeh ahad or sohail ko preview dene keliye likha tha
+const hardCodedShops = [
+	{
+		id: "shop1",
+		name: "Print Shop A",
+		address: "123 Main St, Cityville",
+		capabilities: ["Black & White Printing", "Color Printing", "Binding Services"],
+	},
+];
+
 const NewPrint = () => {
 	const router = useRouter();
 	const [shops, setShops] = useState([]);
@@ -27,7 +37,11 @@ const NewPrint = () => {
 			const response = await fetch(`${API_BASE_URL}/getShops`);
 
 			if (!response.ok) {
-				throw new Error(`HTTP error! status: ${response.status}`);
+				// ye wapas lagana he
+				// throw new Error(`HTTP error! status: ${response.status}`);
+				setShops(hardCodedShops);
+				setLoading(false);
+				return;
 			}
 
 			const data = await response.json();
@@ -248,9 +262,6 @@ const styles = StyleSheet.create({
 		padding: 20,
 		paddingBottom: 120,
 	},
-
-	//----------------------------------------------- Shop Card Styles
-
 	shopCard: {
 		flexDirection: "row",
 		backgroundColor: colors.cardBackground,
@@ -322,8 +333,6 @@ const styles = StyleSheet.create({
 		marginLeft: 8,
 		justifyContent: "center",
 	},
-
-	//------------------------------------- Footer
 	footer: {
 		position: "absolute",
 		bottom: 0,
