@@ -47,8 +47,11 @@ const NewPrint = () => {
 			const data = await response.json();
 			setShops(data.shops);
 		} catch (err) {
-			console.error("Error fetching shops:", err);
-			setError(err.message);
+			console.log(err);
+			//console.error("Error fetching shops:", err);
+			// isko bhi set karna he
+			setShops(hardCodedShops);
+			// setError(err.message);
 		} finally {
 			setLoading(false);
 		}
