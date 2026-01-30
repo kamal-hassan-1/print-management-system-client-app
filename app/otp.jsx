@@ -15,7 +15,6 @@ const VerifyCode = () => {
 	const [showErrorModal, setShowErrorModal] = useState(false);
 	const inputRefs = useRef([]);
 
-
 	const formatPhoneNumber = (phone) => {
 		if (!phone) return "";
 
@@ -66,8 +65,6 @@ const VerifyCode = () => {
 		}
 	};
 
-
-
 	// ****** actual verification API call *******
 	// const handleVerify = async (code) => {
 	// 	try {
@@ -88,7 +85,7 @@ const VerifyCode = () => {
 
 	// 		if (response.ok && data.success) {
 	// 			// SUCCESS: Token usually returned here
-	// 			// Example: await saveToken(data.token); 
+	// 			// Example: await saveToken(data.token);
 	// 			router.replace("/(tabs)/home");
 	// 		} else {
 	// 			// FAILURE: Wrong OTP or expired
@@ -108,7 +105,7 @@ const VerifyCode = () => {
 		// Simulate verification failure for demo
 		if (code === "12345") {
 			// Success - navigate to home
-			router.replace("/(tabs)/home");
+			router.replace("/profile-setup");
 		} else {
 			// Show error modal
 			setShowErrorModal(true);
@@ -144,25 +141,27 @@ const VerifyCode = () => {
 		<SafeAreaView style={styles.container}>
 			<TouchableOpacity
 				style={styles.backButton}
-				onPress={() => router.back()}
-			>
-				<Ionicons name="arrow-back" size={24} color="#fff" />
+				onPress={() => router.back()}>
+				<Ionicons
+					name="arrow-back"
+					size={24}
+					color="#fff"
+				/>
 			</TouchableOpacity>
-
 
 			<Text style={styles.title}>Enter verification code</Text>
 
-
 			<View style={styles.instructionContainer}>
-				<Text style={styles.instructionText}>
-					We&apos;ve sent it to {formatPhoneNumber(phoneNumber)} via
-				</Text>
+				<Text style={styles.instructionText}>We&apos;ve sent it to {formatPhoneNumber(phoneNumber)} via</Text>
 				<View style={styles.whatsappContainer}>
-					<Ionicons name="logo-whatsapp" size={18} color="#25D366" />
+					<Ionicons
+						name="logo-whatsapp"
+						size={18}
+						color="#25D366"
+					/>
 					<Text style={styles.whatsappText}>Whatsapp</Text>
 				</View>
 			</View>
-
 
 			<View style={styles.codeContainer}>
 				{codes.map((code, index) => (
@@ -181,15 +180,14 @@ const VerifyCode = () => {
 				))}
 			</View>
 
-
 			<View style={styles.timerContainer}>
 				{timer > 0 ? (
-					<Text style={styles.timerText}>
-						Call available in {formatTimer(timer)}
-					</Text>
+					<Text style={styles.timerText}>Call available in {formatTimer(timer)}</Text>
 				) : (
 					<View style={styles.actionContainer}>
-						<TouchableOpacity onPress={handleResendCode} style={styles.resendButton}>
+						<TouchableOpacity
+							onPress={handleResendCode}
+							style={styles.resendButton}>
 							<Text style={styles.resendText}>Resend code</Text>
 						</TouchableOpacity>
 						<Text style={styles.separator}>•</Text>
@@ -200,26 +198,25 @@ const VerifyCode = () => {
 				)}
 			</View>
 
-
 			<Modal
 				visible={showErrorModal}
 				transparent={true}
 				animationType="slide"
-				onRequestClose={() => setShowErrorModal(false)}
-			>
+				onRequestClose={() => setShowErrorModal(false)}>
 				<View style={styles.errorModalOverlay}>
 					<View style={styles.errorModalContent}>
 						<Text style={styles.errorModalTitle}>Oops</Text>
-						<Text style={styles.errorModalMessage}>
-							Something went wrong. Please try again.
-						</Text>
+						<Text style={styles.errorModalMessage}>Something went wrong. Please try again.</Text>
 
 						<TouchableOpacity
 							style={styles.errorCancelButton}
-							onPress={() => setShowErrorModal(false)}
-						>
+							onPress={() => setShowErrorModal(false)}>
 							<Text style={styles.errorCancelText}>Cancel</Text>
-							<Ionicons name="close" size={20} color="#FF4F00" />
+							<Ionicons
+								name="close"
+								size={20}
+								color="#FF4F00"
+							/>
 						</TouchableOpacity>
 
 						<TouchableOpacity
@@ -227,10 +224,13 @@ const VerifyCode = () => {
 							onPress={() => {
 								setShowErrorModal(false);
 								handleResendCode();
-							}}
-						>
+							}}>
 							<Text style={styles.errorTryAgainText}>Try again</Text>
-							<Ionicons name="arrow-forward" size={20} color="#fff" />
+							<Ionicons
+								name="arrow-forward"
+								size={20}
+								color="#fff"
+							/>
 						</TouchableOpacity>
 					</View>
 				</View>

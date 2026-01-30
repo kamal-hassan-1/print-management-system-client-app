@@ -3,9 +3,6 @@ import { Tabs } from "expo-router";
 import { colors } from "../../constants/colors";
 
 export default function Layout() {
-
-	
-
 	return (
 		<Tabs
 			screenOptions={{
@@ -15,13 +12,13 @@ export default function Layout() {
 					borderTopWidth: 1,
 					borderTopColor: colors.borderLight,
 					paddingTop: 10,
-					paddingBottom: 28,
+					paddingBottom: 30,
 					height: 80,
 					shadowColor: colors.shadowMedium,
 					shadowOffset: { width: 0, height: -4 },
 					shadowOpacity: 1,
 					shadowRadius: 24,
-					elevation: 8,
+					elevation: 12,
 				},
 				tabBarActiveTintColor: colors.navActive,
 				tabBarInactiveTintColor: colors.navInactive,
@@ -34,6 +31,7 @@ export default function Layout() {
 				},
 			}}>
 			{/* Home Tab */}
+
 			<Tabs.Screen
 				name="home"
 				options={{
@@ -47,7 +45,9 @@ export default function Layout() {
 					),
 				}}
 			/>
+
 			{/* Print History Tab */}
+
 			<Tabs.Screen
 				name="printHistory"
 				options={{
@@ -63,6 +63,7 @@ export default function Layout() {
 			/>
 
 			{/* Profile Tab */}
+
 			<Tabs.Screen
 				name="profile"
 				options={{
@@ -76,8 +77,6 @@ export default function Layout() {
 					),
 				}}
 			/>
-
-			
 		</Tabs>
 	);
 }
