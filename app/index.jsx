@@ -44,8 +44,6 @@ const Login = () => {
 		// 		Alert.alert("Error", "An unexpected error occurred. Please try again.");
 		// 	});
 
-
-
 		console.log("Continue with phone number:", countryCode + phone);
 
 		// Navigate to the main app (tabs)
@@ -83,8 +81,7 @@ const Login = () => {
 					Keyboard.dismiss();
 					setShowPicker(false);
 				}}
-				accessible={false}
-			>
+				accessible={false}>
 				<SafeAreaView style={styles.container}>
 					<Text style={styles.heading}>Let&apos;s get started!</Text>
 					<Text style={styles.subHeading}>Please enter your mobile number</Text>
@@ -146,8 +143,8 @@ const Login = () => {
 						<Text style={styles.buttonText}>Continue</Text>
 						<Ionicons
 							name="arrow-forward"
-							size={20}
-							color= {colors.textPrimary}
+							size={19}
+							color={"#fff"}
 						/>
 					</TouchableOpacity>
 				</SafeAreaView>
@@ -274,11 +271,11 @@ const styles = StyleSheet.create({
 	},
 
 	buttonDisabled: {
-		backgroundColor: "#FF7F66",
+		backgroundColor: colors.navInactive,
 		opacity: 1,
 	},
 	buttonText: {
-		color: colors.textPrimary,
+		color: "#fff",
 		fontSize: 16,
 		marginRight: 10,
 		fontWeight: "bold",

@@ -1,6 +1,6 @@
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Alert, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { colors } from "../../constants/colors";
 
@@ -8,8 +8,19 @@ const Profile = () => {
 	const router = useRouter();
 
 	const handleLogout = () => {
-		console.log("Logout pressed");
-		router.replace("/"); // Navigate to login screen
+		Alert.alert("Logout", "Are you sure you want to logout?", [
+			{
+				text: "Cancel",
+				style: "cancel"
+			},
+			{
+				text: "Logout",
+				onPress: () => {
+					console.log("Logout pressed");
+					router.replace("/"); // Navigate to login screen
+				}
+			}
+		]);
 	};
 
 	return (
@@ -42,7 +53,11 @@ const Profile = () => {
 				<View style={styles.section}>
 					<Text style={styles.sectionTitle}>Account</Text>
 
-					<TouchableOpacity style={styles.menuItem}>
+					<TouchableOpacity
+						style={styles.menuItem}
+						onPress={() => {
+							Alert.alert("Funtionality to be added soon!");
+						}}>
 						<View style={styles.menuItemLeft}>
 							<Feather
 								name="user"
@@ -57,28 +72,15 @@ const Profile = () => {
 							color={colors.textSecondary}
 						/>
 					</TouchableOpacity>
-
-					<TouchableOpacity style={styles.menuItem}>
-						<View style={styles.menuItemLeft}>
-							<Feather
-								name="lock"
-								size={20}
-								color={colors.textPrimary}
-							/>
-							<Text style={styles.menuItemText}>Change Password</Text>
-						</View>
-						<Feather
-							name="chevron-right"
-							size={20}
-							color={colors.textSecondary}
-						/>
-					</TouchableOpacity>
 				</View>
 
 				<View style={styles.section}>
 					<Text style={styles.sectionTitle}>Preferences</Text>
 
-					<TouchableOpacity style={styles.menuItem}>
+					<TouchableOpacity style={styles.menuItem}
+						onPress={() => {
+							Alert.alert("Funtionality to be added soon!");
+						}}>
 						<View style={styles.menuItemLeft}>
 							<Feather
 								name="bell"
@@ -94,7 +96,10 @@ const Profile = () => {
 						/>
 					</TouchableOpacity>
 
-					<TouchableOpacity style={styles.menuItem}>
+					<TouchableOpacity style={styles.menuItem}
+						onPress={() => {
+							Alert.alert("Funtionality to be added soon!");
+						}}>
 						<View style={styles.menuItemLeft}>
 							<Feather
 								name="settings"
@@ -114,7 +119,10 @@ const Profile = () => {
 				<View style={styles.section}>
 					<Text style={styles.sectionTitle}>Help</Text>
 
-					<TouchableOpacity style={styles.menuItem}>
+					<TouchableOpacity style={styles.menuItem}
+						onPress={() => {
+							Alert.alert("Funtionality to be added soon!");
+						}}>
 						<View style={styles.menuItemLeft}>
 							<Feather
 								name="help-circle"
@@ -130,7 +138,10 @@ const Profile = () => {
 						/>
 					</TouchableOpacity>
 
-					<TouchableOpacity style={styles.menuItem}>
+					<TouchableOpacity style={styles.menuItem}
+						onPress={() => {
+							Alert.alert("Funtionality to be added soon!");
+						}}>
 						<View style={styles.menuItemLeft}>
 							<Feather
 								name="mail"

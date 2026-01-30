@@ -1,7 +1,7 @@
 import { Feather } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, Alert, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Alert, KeyboardAvoidingView, Platform, ScrollView, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import config from "../config/config";
 import { colors } from "../constants/colors";
@@ -20,6 +20,8 @@ const PrintSettings = () => {
 	const [pageRange, setPageRange] = useState("all");
 	const [numberOfCopies, setNumberOfCopies] = useState("1");
 	const [sidedness, setSidedness] = useState(null);
+	const [startPage, setStartPage] = useState("");
+	const [endPage, setEndPage] = useState("");
 
 	const { shopId, documentName, documentUri, documentSize, documentMimeType } = params;
 
@@ -30,9 +32,56 @@ const PrintSettings = () => {
 		}
 	}, [router, shopId, documentName, documentUri]);
 
+	const handlePageRangeChange = (value) => {
+		setPageRange(value);
+		if (value === "custom") {
+			Alert.alert("Dear User, Ensure Valid Range", "Otherwise the printer would proceed with printing the entire document.");
+			return;
+		}
+		setStartPage("");
+		setEndPage("");
+	};
+
+	const validatePageRange = () => {
+		if (pageRange === "custom") {
+			const start = parseInt(startPage);
+			const end = parseInt(endPage);
+
+			if (!startPage || !endPage) {
+				Alert.alert("Invalid Range", "Please enter both start and end page numbers.");
+				return false;
+			}
+
+			if (isNaN(start) || isNaN(end)) {
+				Alert.alert("Invalid Range", "Please enter valid page numbers.");
+				return false;
+			}
+
+			if (start < 1) {
+				Alert.alert("Invalid Range", "Start page must be at least 1.");
+				return false;
+			}
+			if (start > end) {
+				Alert.alert("Invalid Range", "Start page cannot be greater than end page.");
+				return false;
+			}
+		}
+		return true;
+	};
+
 	const handleSubmit = async () => {
-		if (!colorMode || !orientation || !sidedness) {
+		if (!colorMode || !orientation || !sidedness || !pageRange || !numberOfCopies) {
 			Alert.alert("Incomplete Settings", "Please select all print settings.");
+			return;
+		}
+		if (!validatePageRange()) {
+			return;
+		}
+
+		// Bug fix: Validate numberOfCopies
+		const copies = parseInt(numberOfCopies);
+		if (isNaN(copies) || copies < 1) {
+			Alert.alert("Invalid Copies", "Number of copies must be at least 1.");
 			return;
 		}
 
@@ -50,7 +99,13 @@ const PrintSettings = () => {
 			form.append("colorMode", colorMode);
 			form.append("orientation", orientation);
 			form.append("pageRange", pageRange);
-			form.append("numberOfCopies", parseInt(numberOfCopies));
+
+			if (pageRange === "custom") {
+				form.append("startPage", parseInt(startPage));
+				form.append("endPage", parseInt(endPage));
+			}
+
+			form.append("numberOfCopies", copies);
 			form.append("sidedness", sidedness);
 
 			console.log("Submitting print job");
@@ -61,12 +116,19 @@ const PrintSettings = () => {
 				body: form,
 			});
 
-			const data = await response.json();
-
-			if (!response.ok) {
-				console.log("Server side error");
-				throw new Error(`HTTP error! status: ${data}`);
+			let data;
+			try {
+				data = await response.json();
+			} catch (jsonError) {
+				console.log(jsonError);
+				throw new Error(`Server returned invalid response: ${response.status}`);
 			}
+
+			// Bug fix: Check response status
+			if (!response.ok) {
+				throw new Error(data.message || `Server error: ${response.status}`);
+			}
+
 			console.log("Job created successfully:", data);
 
 			Alert.alert("Success", "Print job created successfully!", [
@@ -82,6 +144,11 @@ const PrintSettings = () => {
 		} finally {
 			setLoading(false);
 		}
+	};
+	const handleCopiesChange = (delta) => {
+		const currentCopies = parseInt(numberOfCopies) || 1;
+		const newCopies = Math.max(1, currentCopies + delta);
+		setNumberOfCopies(newCopies.toString());
 	};
 
 	const SettingRow = ({ label, options, selectedValue, onSelect }) => (
@@ -122,140 +189,177 @@ const PrintSettings = () => {
 				<View style={styles.placeholder} />
 			</View>
 
-			<ScrollView
-				style={styles.scrollView}
-				contentContainerStyle={styles.scrollContent}>
-				<View style={styles.summaryCard}>
-					<View style={styles.summaryItem}>
-						<Text style={styles.summaryLabel}>Document</Text>
-						<Text style={styles.summaryValue}>{documentName}</Text>
-					</View>
-					<View style={styles.summaryDivider} />
-					<View style={styles.summaryItem}>
-						<Text style={styles.summaryLabel}>File Size</Text>
-						<Text style={styles.summaryValue}>{((documentSize || 0) / 1024).toFixed(2)} KB</Text>
-					</View>
-				</View>
-
-				<View style={styles.settingsSection}>
-					<Text style={styles.sectionTitle}>Print Settings</Text>
-
-					{/* Color Mode */}
-
-					<SettingRow
-						label="Color Mode"
-						options={[
-							{ label: "Color", value: "color" },
-							{ label: "B&W", value: "bw" },
-						]}
-						selectedValue={colorMode}
-						onSelect={setColorMode}
-					/>
-
-					{/* Orientation */}
-
-					<SettingRow
-						label="Orientation"
-						options={[
-							{ label: "Portrait", value: "portrait" },
-							{ label: "Landscape", value: "landscape" },
-						]}
-						selectedValue={orientation}
-						onSelect={setOrientation}
-					/>
-
-					{/* Sidedness */}
-
-					<SettingRow
-						label="Sidedness"
-						options={[
-							{ label: "Single Sided", value: "single" },
-							{ label: "Double Sided", value: "double" },
-						]}
-						selectedValue={sidedness}
-						onSelect={setSidedness}
-					/>
-
-					{/* Page Range */}
-
-					<View style={styles.settingRow}>
-						<Text style={styles.settingLabel}>Page Range</Text>
-						<View style={styles.buttonsContainer}>
-							<TouchableOpacity
-								style={[styles.optionButton, pageRange === "all" && styles.optionButtonActive]}
-								onPress={() => setPageRange("all")}>
-								<Text style={[styles.optionButtonText, pageRange === "all" && styles.optionButtonTextActive]}>All</Text>
-							</TouchableOpacity>
-							<TouchableOpacity
-								style={[styles.optionButton, pageRange !== "all" && styles.optionButtonActive]}
-								onPress={() => setPageRange("custom")}>
-								<Text style={[styles.optionButtonText, pageRange !== "all" && styles.optionButtonTextActive]}>Custom</Text>
-							</TouchableOpacity>
+			<KeyboardAvoidingView
+				style={styles.keyboardAvoidingView}
+				behavior={Platform.OS === "ios" ? "padding" : "height"}
+				keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}>
+				<ScrollView
+					style={styles.scrollView}
+					contentContainerStyle={styles.scrollContent}
+					keyboardShouldPersistTaps="handled">
+					<View style={styles.summaryCard}>
+						<View style={styles.summaryItem}>
+							<Text style={styles.summaryLabel}>Document</Text>
+							<Text style={styles.summaryValue}>{documentName}</Text>
+						</View>
+						<View style={styles.summaryDivider} />
+						<View style={styles.summaryItem}>
+							<Text style={styles.summaryLabel}>File Size</Text>
+							<Text style={styles.summaryValue}>{((documentSize || 0) / 1024).toFixed(2)} KB</Text>
 						</View>
 					</View>
 
-					{/* Number of Copies */}
+					<View style={styles.settingsSection}>
+						<Text style={styles.sectionTitle}>Print Settings</Text>
 
-					<View style={styles.settingRow}>
-						<Text style={styles.settingLabel}>Number of Copies</Text>
-						<View style={styles.copiesContainer}>
-							<TouchableOpacity
-								style={styles.copiesButton}
-								onPress={() => setNumberOfCopies(Math.max(1, parseInt(numberOfCopies) - 1).toString())}>
-								<Feather
-									name="minus"
-									size={20}
-									color={colors.textPrimary}
-								/>
-							</TouchableOpacity>
-							<Text style={styles.copiesValue}>{numberOfCopies}</Text>
-							<TouchableOpacity
-								style={styles.copiesButton}
-								onPress={() => setNumberOfCopies((parseInt(numberOfCopies) + 1).toString())}>
-								<Feather
-									name="plus"
-									size={20}
-									color={colors.textPrimary}
-								/>
-							</TouchableOpacity>
+						{/* Color Mode */}
+						<SettingRow
+							label="Color Mode"
+							options={[
+								{ label: "Color", value: "color" },
+								{ label: "B&W", value: "bw" },
+							]}
+							selectedValue={colorMode}
+							onSelect={setColorMode}
+						/>
+
+						{/* Orientation */}
+						<SettingRow
+							label="Orientation"
+							options={[
+								{ label: "Portrait", value: "portrait" },
+								{ label: "Landscape", value: "landscape" },
+							]}
+							selectedValue={orientation}
+							onSelect={setOrientation}
+						/>
+
+						{/* Sidedness */}
+						<SettingRow
+							label="Sidedness"
+							options={[
+								{ label: "Single Sided", value: "single" },
+								{ label: "Double Sided", value: "double" },
+							]}
+							selectedValue={sidedness}
+							onSelect={setSidedness}
+						/>
+
+						{/* Page Range */}
+						<View style={styles.settingRow}>
+							<Text style={styles.settingLabel}>Page Range</Text>
+							<View style={styles.buttonsContainer}>
+								<TouchableOpacity
+									style={[styles.optionButton, pageRange === "all" && styles.optionButtonActive]}
+									onPress={() => handlePageRangeChange("all")}>
+									<Text style={[styles.optionButtonText, pageRange === "all" && styles.optionButtonTextActive]}>All</Text>
+								</TouchableOpacity>
+								<TouchableOpacity
+									style={[styles.optionButton, pageRange === "custom" && styles.optionButtonActive]}
+									onPress={() => handlePageRangeChange("custom")}>
+									<Text style={[styles.optionButtonText, pageRange === "custom" && styles.optionButtonTextActive]}>Custom</Text>
+								</TouchableOpacity>
+							</View>
+						</View>
+
+						{/* Custom Page Range Inputs */}
+						{pageRange === "custom" && (
+							<View style={styles.customRangeContainer}>
+								<View style={styles.pageInputRow}>
+									<View style={styles.pageInputGroup}>
+										<Text style={styles.pageInputLabel}>Start Page</Text>
+										<TextInput
+											style={styles.pageInput}
+											keyboardType="number-pad"
+											placeholder="1"
+											placeholderTextColor={colors.textSecondary}
+											value={startPage}
+											onChangeText={setStartPage}
+											maxLength={4}
+											returnKeyType="next"
+										/>
+									</View>
+
+									<Text style={styles.pageRangeSeparator}>to</Text>
+
+									<View style={styles.pageInputGroup}>
+										<Text style={styles.pageInputLabel}>End Page</Text>
+										<TextInput
+											style={styles.pageInput}
+											keyboardType="number-pad"
+											placeholder="10"
+											placeholderTextColor={colors.textSecondary}
+											value={endPage}
+											onChangeText={setEndPage}
+											maxLength={4}
+											returnKeyType="done"
+										/>
+									</View>
+								</View>
+							</View>
+						)}
+
+						{/* Number of Copies */}
+						<View style={styles.settingRow}>
+							<Text style={styles.settingLabel}>Number of Copies</Text>
+							<View style={styles.copiesContainer}>
+								<TouchableOpacity
+									style={styles.copiesButton}
+									onPress={() => handleCopiesChange(-1)}>
+									<Feather
+										name="minus"
+										size={20}
+										color={colors.textPrimary}
+									/>
+								</TouchableOpacity>
+								<Text style={styles.copiesValue}>{numberOfCopies}</Text>
+								<TouchableOpacity
+									style={styles.copiesButton}
+									onPress={() => handleCopiesChange(1)}>
+									<Feather
+										name="plus"
+										size={20}
+										color={colors.textPrimary}
+									/>
+								</TouchableOpacity>
+							</View>
 						</View>
 					</View>
-				</View>
 
-				{error && (
-					<View style={styles.errorBox}>
-						<Feather
-							name="alert-circle"
-							size={18}
-							color={colors.printRequest}
-						/>
-						<Text style={styles.errorText}>{error}</Text>
-					</View>
-				)}
-			</ScrollView>
-
-			<View style={styles.footer}>
-				<TouchableOpacity
-					style={[styles.submitButton, loading && styles.submitButtonDisabled]}
-					onPress={handleSubmit}
-					disabled={loading || !colorMode || !orientation || !sidedness}>
-					{loading ? (
-						<ActivityIndicator
-							size="small"
-							color={colors.cardBackground}
-						/>
-					) : (
-						<>
-							<Text style={styles.submitButtonText}>Create Print Job</Text>
+					{error && (
+						<View style={styles.errorBox}>
 							<Feather
-								name="arrow-right"
-								size={20}
+								name="alert-circle"
+								size={18}
+								color={colors.printRequest}
+							/>
+							<Text style={styles.errorText}>{error}</Text>
+						</View>
+					)}
+				</ScrollView>
+
+				<View style={styles.footer}>
+					<TouchableOpacity
+						style={[styles.submitButton, loading && styles.submitButtonDisabled]}
+						onPress={handleSubmit}>
+						{loading ? (
+							<ActivityIndicator
+								size="small"
 								color={colors.cardBackground}
 							/>
-						</>
-					)}
-				</TouchableOpacity>
-			</View>
+						) : (
+							<>
+								<Text style={styles.submitButtonText}>Create Print Job</Text>
+								<Feather
+									name="arrow-right"
+									size={20}
+									color={colors.cardBackground}
+								/>
+							</>
+						)}
+					</TouchableOpacity>
+				</View>
+			</KeyboardAvoidingView>
 		</SafeAreaView>
 	);
 };
@@ -288,6 +392,9 @@ const styles = StyleSheet.create({
 	},
 	placeholder: {
 		width: 40,
+	},
+	keyboardAvoidingView: {
+		flex: 1,
 	},
 	scrollView: {
 		flex: 1,
@@ -375,6 +482,49 @@ const styles = StyleSheet.create({
 	},
 	optionButtonTextActive: {
 		color: colors.cardBackground,
+	},
+	customRangeContainer: {
+		backgroundColor: colors.background,
+		borderRadius: 12,
+		padding: 16,
+		marginBottom: 20,
+		borderWidth: 1,
+		borderColor: colors.borderLight,
+	},
+	pageInputRow: {
+		flexDirection: "row",
+		alignItems: "center",
+		justifyContent: "space-between",
+		marginBottom: 12,
+	},
+	pageInputGroup: {
+		flex: 1,
+	},
+	pageInputLabel: {
+		fontSize: 12,
+		fontWeight: "600",
+		color: colors.textSecondary,
+		marginBottom: 8,
+		textTransform: "uppercase",
+		letterSpacing: 0.5,
+	},
+	pageInput: {
+		borderWidth: 1.5,
+		borderColor: colors.borderLight,
+		borderRadius: 8,
+		paddingVertical: 12,
+		paddingHorizontal: 16,
+		fontSize: 16,
+		fontWeight: "600",
+		color: colors.textPrimary,
+		backgroundColor: colors.cardBackground,
+	},
+	pageRangeSeparator: {
+		fontSize: 14,
+		fontWeight: "600",
+		color: colors.textSecondary,
+		paddingHorizontal: 12,
+		marginTop: 20,
 	},
 	copiesContainer: {
 		flexDirection: "row",

@@ -1,6 +1,6 @@
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { Dimensions, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Alert, Dimensions, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import TransactionList from "../../components/TransactionList";
 import { colors } from "../../constants/colors";
@@ -35,28 +35,19 @@ const HomePage = () => {
 						{/* Current Balance Card */}
 						<TouchableOpacity style={styles.balanceCard}>
 							<View style={styles.balanceContent}>
-								<View>
-									<Text style={styles.balanceLabel}>Current Balance</Text>
-									<Text style={styles.balanceAmount}>Rs. 0</Text>
-								</View>
-
-								{/* Arrow */}
-								<View style={styles.balanceFooter}>
-									<View style={styles.arrowButton}>
-										<Feather
-											name="arrow-right"
-											size={24}
-											color={colors.cardBackground}
-										/>
-									</View>
-								</View>
+								<Text style={styles.balanceLabel}>Current Balance</Text>
+								<Text style={styles.balanceAmount}>Rs. 0</Text>
 							</View>
 						</TouchableOpacity>
 
 						{/* Action Cards Column */}
 						<View style={styles.actionCardsColumn}>
 							{/* Credit Wallet Card */}
-							<TouchableOpacity style={[styles.actionCard, styles.creditWalletCard]}>
+							<TouchableOpacity
+								style={[styles.actionCard, styles.creditWalletCard]}
+								onPress={() => {
+									Alert.alert("Payment funtionality to be added soon!");
+								}}>
 								<View style={styles.actionCardIcon}>
 									<Feather
 										name="arrow-down"
@@ -143,7 +134,7 @@ const styles = StyleSheet.create({
 	},
 	balanceContent: {
 		flex: 1,
-		justifyContent: "space-between",
+		justifyContent: "flex-start",
 	},
 	balanceLabel: {
 		fontSize: 18,

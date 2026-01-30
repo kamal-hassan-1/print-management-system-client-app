@@ -105,7 +105,7 @@ const PrintHistory = () => {
 					style={styles.filterButton}
 					onPress={() => setSortModalVisible(true)}>
 					<Feather
-						name="arrow-up-down"
+						name="arrow-up-right"
 						size={18}
 						color={colors.textPrimary}
 					/>
