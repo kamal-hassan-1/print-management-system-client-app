@@ -33,6 +33,7 @@ export default function Layout() {
 					marginBottom: -4,
 				},
 			}}>
+
 			{/* Home Tab */}
 
 			<Tabs.Screen

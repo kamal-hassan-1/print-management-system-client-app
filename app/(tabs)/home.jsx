@@ -10,13 +10,6 @@ const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
 const HomePage = () => {
 	const router = useRouter();
-
-	const handleTransactionPress = (transaction) => {
-		console.log("Transaction pressed:", transaction);
-		// Navigate to transaction details screen if needed
-		// router.push({ pathname: '/transaction-details', params: { id: transaction.id } });
-	};
-
 	return (
 		<SafeAreaView
 			style={styles.container}
@@ -30,9 +23,11 @@ const HomePage = () => {
 				contentContainerStyle={styles.scrollContent}
 				showsVerticalScrollIndicator={false}>
 				{/* Top Cards Section */}
+
 				<View style={styles.topCardsContainer}>
 					<View style={styles.cardsRow}>
 						{/* Current Balance Card */}
+
 						<TouchableOpacity style={styles.balanceCard}>
 							<View style={styles.balanceContent}>
 								<Text style={styles.balanceLabel}>Current Balance</Text>
@@ -41,8 +36,10 @@ const HomePage = () => {
 						</TouchableOpacity>
 
 						{/* Action Cards Column */}
+
 						<View style={styles.actionCardsColumn}>
 							{/* Credit Wallet Card */}
+
 							<TouchableOpacity
 								style={[styles.actionCard, styles.creditWalletCard]}
 								onPress={() => {
@@ -59,6 +56,7 @@ const HomePage = () => {
 							</TouchableOpacity>
 
 							{/* New Print Card */}
+
 							<TouchableOpacity
 								style={[styles.actionCard, styles.printRequestCard]}
 								onPress={() => {
@@ -78,6 +76,7 @@ const HomePage = () => {
 				</View>
 
 				{/* Transaction History - Latest 3 */}
+
 				<View style={styles.transactionsContainer}>
 					<View style={styles.historyHeader}>
 						<Text style={styles.historyTitle}>Recent Transactions</Text>
@@ -89,13 +88,14 @@ const HomePage = () => {
 					<TransactionList
 						transactions={mockTransactions}
 						limit={3}
-						onTransactionPress={handleTransactionPress}
 					/>
 				</View>
 			</ScrollView>
 		</SafeAreaView>
 	);
 };
+
+//----------------------------------- Styles -----------------------------------//
 
 const styles = StyleSheet.create({
 	container: {
@@ -234,5 +234,4 @@ const styles = StyleSheet.create({
 		color: colors.primary,
 	},
 });
-
 export default HomePage;

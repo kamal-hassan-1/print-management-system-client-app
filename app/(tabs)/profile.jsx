@@ -6,7 +6,6 @@ import { colors } from "../../constants/colors";
 
 const Profile = () => {
 	const router = useRouter();
-
 	const handleLogout = () => {
 		Alert.alert("Logout", "Are you sure you want to logout?", [
 			{
@@ -17,7 +16,7 @@ const Profile = () => {
 				text: "Logout",
 				onPress: () => {
 					console.log("Logout pressed");
-					router.replace("/"); // Navigate to login screen
+					router.replace("/");
 				}
 			}
 		]);

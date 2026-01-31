@@ -1,7 +1,5 @@
 import Constants from "expo-constants";
-
 const config = {
-	apiBaseUrl: Constants.expoConfig?.extra?.apiBaseUrl || "http://localhost:3000",
+	apiBaseUrl: Constants.expoConfig?.extra?.apiBaseUrl,
 };
-
 export default config;
