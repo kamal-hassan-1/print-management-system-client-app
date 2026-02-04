@@ -8,7 +8,7 @@ const TransactionItem = ({ transaction, onPress }) => {
 			style={styles.transactionCard}
 			onPress={onPress}>
 			<View style={styles.transactionLeft}>
-				{/* Print Icon */}
+				{/*----------------- Print Icon -------------------- */}
 				<View style={styles.transactionIcon}>
 					<Feather
 						name="file-text"
@@ -17,7 +17,7 @@ const TransactionItem = ({ transaction, onPress }) => {
 					/>
 				</View>
 
-				{/* Transaction Info */}
+				{/*----------------- Transaction Info (Name, Time, Pages, Print Size) -------------------- */}
 				<View style={styles.transactionInfo}>
 					<Text style={styles.transactionName}>{transaction.name}</Text>
 					<View style={styles.transactionDetails}>
@@ -30,7 +30,7 @@ const TransactionItem = ({ transaction, onPress }) => {
 				</View>
 			</View>
 
-			{/* Amount */}
+			{/*----------------- Amount -------------------- */}
 			<View style={styles.transactionRight}>
 				<Text style={styles.transactionAmount}>Rs. {transaction.amount.toLocaleString()}</Text>
 			</View>

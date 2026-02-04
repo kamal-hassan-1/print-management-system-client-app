@@ -1,15 +1,37 @@
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { Alert, Dimensions, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Alert, Dimensions, RefreshControl, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import TransactionList from "../../components/TransactionList";
 import { colors } from "../../constants/colors";
-import { mockTransactions } from "../../data/mockData";
+import { useTransactions } from "../../hooks/useTransactions";
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
 const HomePage = () => {
 	const router = useRouter();
+	const { transactions, loading, error, refresh, refreshing } = useTransactions();
+	if (loading) {
+		return (
+			<View style={styles.centerContainer}>
+				<ActivityIndicator
+					size="large"
+					color={colors.primary}
+				/>
+			</View>
+		);
+	}
+
+	if (error) {
+		return (
+			<View style={styles.centerContainer}>
+				<Text style={styles.errorText}>Error loading transactions</Text>
+				<TouchableOpacity onPress={refresh} style={styles.retryButton}>
+					<Text style={styles.retryText}>Retry</Text>
+				</TouchableOpacity>
+			</View>
+		);
+	}
 	return (
 		<SafeAreaView
 			style={styles.container}
@@ -21,7 +43,13 @@ const HomePage = () => {
 			<ScrollView
 				style={styles.scrollView}
 				contentContainerStyle={styles.scrollContent}
-				showsVerticalScrollIndicator={false}>
+				showsVerticalScrollIndicator={false}
+				refreshControl={
+					<RefreshControl
+						refreshing={refreshing}
+						onRefresh={refresh}
+					/>
+				}>
 				{/* Top Cards Section */}
 
 				<View style={styles.topCardsContainer}>
@@ -43,7 +71,7 @@ const HomePage = () => {
 							<TouchableOpacity
 								style={[styles.actionCard, styles.creditWalletCard]}
 								onPress={() => {
-									Alert.alert("Payment funtionality to be added soon!");
+									Alert.alert("Payment functionality to be added soon!");
 								}}>
 								<View style={styles.actionCardIcon}>
 									<Feather
@@ -86,7 +114,7 @@ const HomePage = () => {
 					</View>
 
 					<TransactionList
-						transactions={mockTransactions}
+						transactions={transactions}
 						limit={3}
 					/>
 				</View>
@@ -101,6 +129,28 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 		backgroundColor: colors.background,
+	},
+	centerContainer: {
+		flex: 1,
+		justifyContent: "center",
+		alignItems: "center",
+		backgroundColor: colors.background,
+	},
+	errorText: {
+		fontSize: 16,
+		color: colors.textPrimary,
+		marginBottom: 16,
+	},
+	retryButton: {
+		backgroundColor: colors.primary,
+		paddingHorizontal: 24,
+		paddingVertical: 12,
+		borderRadius: 8,
+	},
+	retryText: {
+		color: colors.cardBackground,
+		fontWeight: "600",
+		fontSize: 14,
 	},
 	scrollView: {
 		flex: 1,
@@ -149,18 +199,6 @@ const styles = StyleSheet.create({
 		fontWeight: "700",
 		color: colors.cardBackground,
 		letterSpacing: -2,
-	},
-	balanceFooter: {
-		flexDirection: "row",
-		justifyContent: "flex-end",
-	},
-	arrowButton: {
-		width: 48,
-		height: 48,
-		borderRadius: 12,
-		backgroundColor: colors.cardOverlay,
-		justifyContent: "center",
-		alignItems: "center",
 	},
 	actionCardsColumn: {
 		flex: 1,

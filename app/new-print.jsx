@@ -34,15 +34,15 @@ const NewPrint = () => {
 			setShops(data.shops);
 		} catch (err) {
 			console.error("Error fetching shops:", err);
-			setError(err.message);
+			setError(err.message || "Failed to load shops. Please try again.");
 		} finally {
 			setLoading(false);
 		}
 	};
 
 	const handleShopSelect = (shop) => {
-		setSelectedShop(shop.id);
-		console.log("Selected shop:", shop);
+		setSelectedShop(shop._id);
+		console.log("Selected shop:", shop.name);
 	};
 
 	const handleContinue = () => {
@@ -51,7 +51,7 @@ const NewPrint = () => {
 			return;
 		}
 
-		const shop = shops.find((s) => s.id === selectedShop);
+		const shop = shops.find((s) => s._id === selectedShop);
 		console.log("Continuing with shop:", shop);
 		router.push({ pathname: "/upload-document", params: { shopId: selectedShop } });
 	};
@@ -93,11 +93,25 @@ const NewPrint = () => {
 						size={48}
 						color={colors.expense}
 					/>
-					<Text style={styles.errorText}>Failed to load shops</Text>
+					<Text style={styles.errorText}>{error}</Text>
 					<TouchableOpacity
 						style={styles.retryButton}
 						onPress={fetchShops}>
 						<Text style={styles.retryButtonText}>Retry</Text>
+					</TouchableOpacity>
+				</View>
+			) : shops.length === 0 ? (
+				<View style={styles.emptyContainer}>
+					<Feather
+						name="inbox"
+						size={48}
+						color={colors.textSecondary}
+					/>
+					<Text style={styles.emptyText}>No print shops available</Text>
+					<TouchableOpacity
+						style={styles.retryButton}
+						onPress={fetchShops}>
+						<Text style={styles.retryButtonText}>Refresh</Text>
 					</TouchableOpacity>
 				</View>
 			) : (
@@ -105,14 +119,16 @@ const NewPrint = () => {
 					<ScrollView
 						style={styles.scrollView}
 						contentContainerStyle={styles.scrollContent}>
-						{shops.map((shop) => (
-							<ShopCard
-								key={shop.id}
-								shop={shop}
-								isSelected={selectedShop === shop.id}
-								onSelect={() => handleShopSelect(shop)}
-							/>
-						))}
+						{shops.map((shop) => {
+							return (
+								<ShopCard
+									key={shop._id || shop.id || Math.random()} // Fallback key to prevent crash while debugging
+									shop={shop}
+									isSelected={selectedShop && (selectedShop === shop._id || selectedShop === shop.id)}
+									onSelect={() => handleShopSelect(shop)}
+								/>
+							);
+						})}
 					</ScrollView>
 
 					<View style={styles.footer}>

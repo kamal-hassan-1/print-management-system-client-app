@@ -1,30 +1,39 @@
 import { Feather } from "@expo/vector-icons";
 import { useMemo, useState } from "react";
-import { Modal, ScrollView, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Modal, RefreshControl, ScrollView, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import TransactionList from "../../components/TransactionList";
 import { colors } from "../../constants/colors";
-import { mockTransactions } from "../../data/mockData";
+import { useTransactions } from "../../hooks/useTransactions";
 
 const PrintHistory = () => {
+	// Fetch transactions from backend
+	const { transactions: backendTransactions, loading, error, refreshing, refresh } = useTransactions();
+
 	// Filter states
 	const [filterModalVisible, setFilterModalVisible] = useState(false);
 	const [sortModalVisible, setSortModalVisible] = useState(false);
 	const [dateFrom, setDateFrom] = useState("");
 	const [dateTo, setDateTo] = useState("");
-	const [sortBy, setSortBy] = useState("date"); // 'date', 'price', 'printSize'
-	const [sortOrder, setSortOrder] = useState("desc"); // 'asc', 'desc'
+	const [sortBy, setSortBy] = useState("date");
+	const [sortOrder, setSortOrder] = useState("desc");
 
 	// Filter and sort transactions
 	const filteredAndSortedTransactions = useMemo(() => {
-		let filtered = [...mockTransactions];
+		let filtered = [...backendTransactions];
 
-		// Filter by date range
+		// Filter by date range - with date validation
 		if (dateFrom) {
-			filtered = filtered.filter((t) => new Date(t.date) >= new Date(dateFrom));
+			const fromDate = new Date(dateFrom);
+			if (!isNaN(fromDate.getTime())) {
+				filtered = filtered.filter((t) => new Date(t.timestamp || t.date) >= fromDate);
+			}
 		}
 		if (dateTo) {
-			filtered = filtered.filter((t) => new Date(t.date) <= new Date(dateTo));
+			const toDate = new Date(dateTo);
+			if (!isNaN(toDate.getTime())) {
+				filtered = filtered.filter((t) => new Date(t.timestamp || t.date) <= toDate);
+			}
 		}
 
 		// Sort
@@ -33,13 +42,17 @@ const PrintHistory = () => {
 
 			switch (sortBy) {
 				case "date":
-					comparison = new Date(a.date + " " + a.time) - new Date(b.date + " " + b.time);
+					// Use timestamp for accurate sorting
+					comparison = new Date(a.timestamp) - new Date(b.timestamp);
 					break;
 				case "price":
 					comparison = a.amount - b.amount;
 					break;
 				case "printSize":
-					comparison = a.printSize.localeCompare(b.printSize);
+					// Add null/undefined checks
+					const sizeA = a.printSize || "";
+					const sizeB = b.printSize || "";
+					comparison = sizeA.localeCompare(sizeB);
 					break;
 				default:
 					comparison = 0;
@@ -49,12 +62,7 @@ const PrintHistory = () => {
 		});
 
 		return filtered;
-	}, [dateFrom, dateTo, sortBy, sortOrder]);
-
-	const handleTransactionPress = (transaction) => {
-		console.log("Transaction pressed:", transaction);
-		// Navigate to transaction details if needed
-	};
+	}, [backendTransactions, dateFrom, dateTo, sortBy, sortOrder]);
 
 	const clearFilters = () => {
 		setDateFrom("");
@@ -68,6 +76,60 @@ const PrintHistory = () => {
 		if (dateFrom || dateTo) count++;
 		return count;
 	};
+
+	// Loading state
+	if (loading) {
+		return (
+			<SafeAreaView
+				style={styles.container}
+				edges={["top"]}>
+				<StatusBar
+					barStyle="dark-content"
+					backgroundColor={colors.background}
+				/>
+				<View style={styles.header}>
+					<Text style={styles.headerTitle}>Print History</Text>
+				</View>
+				<View style={styles.loadingContainer}>
+					<ActivityIndicator
+						size="large"
+						color={colors.primary}
+					/>
+					<Text style={styles.loadingText}>Loading transactions...</Text>
+				</View>
+			</SafeAreaView>
+		);
+	}
+
+	// Error state
+	if (error) {
+		return (
+			<SafeAreaView
+				style={styles.container}
+				edges={["top"]}>
+				<StatusBar
+					barStyle="dark-content"
+					backgroundColor={colors.background}
+				/>
+				<View style={styles.header}>
+					<Text style={styles.headerTitle}>Print History</Text>
+				</View>
+				<View style={styles.errorContainer}>
+					<Feather
+						name="alert-circle"
+						size={48}
+						color={colors.expense}
+					/>
+					<Text style={styles.errorText}>{error}</Text>
+					<TouchableOpacity
+						style={styles.retryButton}
+						onPress={refresh}>
+						<Text style={styles.retryButtonText}>Retry</Text>
+					</TouchableOpacity>
+				</View>
+			</SafeAreaView>
+		);
+	}
 
 	return (
 		<SafeAreaView
@@ -125,11 +187,27 @@ const PrintHistory = () => {
 			<ScrollView
 				style={styles.scrollView}
 				contentContainerStyle={styles.scrollContent}
-				showsVerticalScrollIndicator={false}>
-				<TransactionList
-					transactions={filteredAndSortedTransactions}
-					onTransactionPress={handleTransactionPress}
-				/>
+				showsVerticalScrollIndicator={false}
+				refreshControl={
+					<RefreshControl
+						refreshing={refreshing}
+						onRefresh={refresh}
+						colors={[colors.primary]}
+						tintColor={colors.primary}
+					/>
+				}>
+				{filteredAndSortedTransactions.length === 0 ? (
+					<View style={styles.emptyContainer}>
+						<Feather
+							name="inbox"
+							size={48}
+							color={colors.textSecondary}
+						/>
+						<Text style={styles.emptyText}>No transactions found</Text>
+					</View>
+				) : (
+					<TransactionList transactions={filteredAndSortedTransactions} />
+				)}
 			</ScrollView>
 
 			{/* Filter Modal */}
@@ -211,8 +289,14 @@ const PrintHistory = () => {
 						<TouchableOpacity
 							style={styles.sortOption}
 							onPress={() => {
-								setSortBy("date");
-								setSortOrder(sortBy === "date" && sortOrder === "desc" ? "asc" : "desc");
+								if (sortBy === "date") {
+									// Toggle order if already on this sort type
+									setSortOrder(sortOrder === "desc" ? "asc" : "desc");
+								} else {
+									// Switch to this sort type with default desc order
+									setSortBy("date");
+									setSortOrder("desc");
+								}
 							}}>
 							<View style={styles.sortOptionLeft}>
 								<Feather
@@ -234,8 +318,14 @@ const PrintHistory = () => {
 						<TouchableOpacity
 							style={styles.sortOption}
 							onPress={() => {
-								setSortBy("price");
-								setSortOrder(sortBy === "price" && sortOrder === "desc" ? "asc" : "desc");
+								if (sortBy === "price") {
+									// Toggle order if already on this sort type
+									setSortOrder(sortOrder === "desc" ? "asc" : "desc");
+								} else {
+									// Switch to this sort type with default desc order
+									setSortBy("price");
+									setSortOrder("desc");
+								}
 							}}>
 							<View style={styles.sortOptionLeft}>
 								<Feather
@@ -257,8 +347,14 @@ const PrintHistory = () => {
 						<TouchableOpacity
 							style={styles.sortOption}
 							onPress={() => {
-								setSortBy("printSize");
-								setSortOrder(sortBy === "printSize" && sortOrder === "desc" ? "asc" : "desc");
+								if (sortBy === "printSize") {
+									// Toggle order if already on this sort type
+									setSortOrder(sortOrder === "desc" ? "asc" : "desc");
+								} else {
+									// Switch to this sort type with default desc order
+									setSortBy("printSize");
+									setSortOrder("desc");
+								}
 							}}>
 							<View style={styles.sortOptionLeft}>
 								<Feather
@@ -445,6 +541,50 @@ const styles = StyleSheet.create({
 		fontSize: 16,
 		fontWeight: "500",
 		color: colors.textPrimary,
+	},
+	loadingContainer: {
+		flex: 1,
+		justifyContent: "center",
+		alignItems: "center",
+		gap: 12,
+	},
+	loadingText: {
+		fontSize: 14,
+		color: colors.textSecondary,
+	},
+	errorContainer: {
+		flex: 1,
+		justifyContent: "center",
+		alignItems: "center",
+		padding: 20,
+		gap: 16,
+	},
+	errorText: {
+		fontSize: 16,
+		color: colors.textSecondary,
+		textAlign: "center",
+	},
+	retryButton: {
+		backgroundColor: colors.primary,
+		paddingHorizontal: 24,
+		paddingVertical: 12,
+		borderRadius: 12,
+	},
+	retryButtonText: {
+		fontSize: 14,
+		fontWeight: "600",
+		color: colors.cardBackground,
+	},
+	emptyContainer: {
+		flex: 1,
+		justifyContent: "center",
+		alignItems: "center",
+		paddingVertical: 60,
+		gap: 12,
+	},
+	emptyText: {
+		fontSize: 16,
+		color: colors.textSecondary,
 	},
 });
 
