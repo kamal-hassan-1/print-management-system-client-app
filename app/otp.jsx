@@ -1,35 +1,26 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import * as SecureStore from "expo-secure-store";
 import { useEffect, useRef, useState } from "react";
 import { Alert, Modal, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import config from "../config/config";
 import { colors } from "../constants/colors";
+
+const API_BASE_URL = config.apiBaseUrl;
 
 const VerifyCode = () => {
 	const router = useRouter();
 	const params = useLocalSearchParams();
-	const phoneNumber = params.phone || "+92-327-5555555";
+	const phoneNumber = params.phone;
 
 	const [codes, setCodes] = useState(["", "", "", "", ""]);
 	const [timer, setTimer] = useState(30);
 	const [showErrorModal, setShowErrorModal] = useState(false);
 	const inputRefs = useRef([]);
 
-	const formatPhoneNumber = (phone) => {
-		if (!phone) return "";
+	//--------------------------------------------- TIMER COUNTDOWN ------------------------------------------------//
 
-		if (phone.includes("-")) return phone;
-		// Format: +92-XXX-XXXXXXX
-		if (phone.startsWith("+92")) {
-			const cleaned = phone.replace("+92", "").replace(/\D/g, "");
-			if (cleaned.length >= 10) {
-				return `+92-${cleaned.slice(0, 3)}-${cleaned.slice(3)}`;
-			}
-		}
-		return phone;
-	};
-
-	// Timer countdown
 	useEffect(() => {
 		if (timer > 0) {
 			const interval = setInterval(() => {
@@ -40,18 +31,13 @@ const VerifyCode = () => {
 	}, [timer]);
 
 	const handleCodeChange = (value, index) => {
-		// Only allow single digit
 		if (value.length > 1) return;
-
 		const newCodes = [...codes];
 		newCodes[index] = value;
 		setCodes(newCodes);
-
-		// Auto-focus next input
 		if (value && index < 4) {
 			inputRefs.current[index + 1]?.focus();
 		}
-
 		// Auto-verify when all 5 digits are entered
 		if (newCodes.every((code) => code !== "") && index === 4) {
 			handleVerify(newCodes.join(""));
@@ -59,76 +45,54 @@ const VerifyCode = () => {
 	};
 
 	const handleKeyPress = (e, index) => {
-		// Handle backspace to go to previous input
 		if (e.nativeEvent.key === "Backspace" && !codes[index] && index > 0) {
 			inputRefs.current[index - 1]?.focus();
 		}
 	};
 
-	// ****** actual verification API call *******
-	// const handleVerify = async (code) => {
-	// 	try {
-	// 		console.log("Verifying code:", code, "for", phoneNumber);
-
-	// 		const response = await fetch("https://example.com/api/auth/verify", {
-	// 			method: "POST",
-	// 			headers: {
-	// 				"Content-Type": "application/json",
-	// 			},
-	// 			body: JSON.stringify({
-	// 				phone: phoneNumber,
-	// 				otp: code,
-	// 			}),
-	// 		});
-
-	// 		const data = await response.json();
-
-	// 		if (response.ok && data.success) {
-	// 			// SUCCESS: Token usually returned here
-	// 			// Example: await saveToken(data.token);
-	// 			router.replace("/(tabs)/home");
-	// 		} else {
-	// 			// FAILURE: Wrong OTP or expired
-	// 			handleVerificationFailure();
-	// 		}
-	// 	} catch (error) {
-	// 		console.error("Verification API Error:", error);
-	// 		Alert.alert("Connection Error", "Check your internet and try again.");
-	// 	}
-	// };
-
-	const handleVerify = (code) => {
-		// TODO: Implement actual verification API call
-
-		console.log("Verifying code:", code);
-
-		// Simulate verification failure for demo
-		if (code === "12345") {
-			// Success - navigate to home
-			router.replace("/profile-setup");
-		} else {
-			// Show error modal
+	const handleVerify = async (code) => {
+		try {
+			const response = await fetch(`${API_BASE_URL}/auth/verify-otp`, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({ code, phoneNumber }),
+			});
+			const data = await response.json();
+			if (data.success) {
+				await SecureStore.setItemAsync("authToken", data.token);
+				router.replace({ pathname: "/profile-setup" });
+			} else {
+				setShowErrorModal(true);
+			}
+		} catch (error) {
+			console.error("Error verifying OTP:", error);
 			setShowErrorModal(true);
-			// Clear codes
-			setCodes(["", "", "", "", ""]);
-			inputRefs.current[0]?.focus();
 		}
 	};
 
-	const handleResendCode = () => {
+	const handleResendCode = async () => {
 		if (timer > 0) return;
-		// TODO: Implement resend code API call
-		console.log("Resending code to:", phoneNumber);
-		setTimer(30);
-		setCodes(["", "", "", "", ""]);
-		inputRefs.current[0]?.focus();
-	};
-
-	const handleCall = () => {
-		if (timer > 0) return;
-		// TODO: Implement call API
-		console.log("Calling:", phoneNumber);
-		Alert.alert("Call", `Calling ${phoneNumber}...`);
+		try {
+			const response = await fetch(`${API_BASE_URL}/auth/otp`, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({ number: phoneNumber }),
+			});
+			const data = await response.json();
+			if (data.success) {
+				router.replace({ pathname: "/otp", params: { phone: phoneNumber } });
+			} else {
+				Alert.alert("Error", "Failed to send OTP. Please try again.");
+				console.error("OTP request failed:", data.message);
+			}
+		} catch (error) {
+			console.error("Error sending OTP:", error);
+			Alert.alert("Error", "An unexpected error occurred. Please try again.");
+		}
 	};
 
 	const formatTimer = (seconds) => {
@@ -152,7 +116,7 @@ const VerifyCode = () => {
 			<Text style={styles.title}>Enter verification code</Text>
 
 			<View style={styles.instructionContainer}>
-				<Text style={styles.instructionText}>We&apos;ve sent it to {formatPhoneNumber(phoneNumber)} via</Text>
+				<Text style={styles.instructionText}>We&apos;ve sent it to {phoneNumber} via</Text>
 				<View style={styles.whatsappContainer}>
 					<Ionicons
 						name="logo-whatsapp"
@@ -182,17 +146,13 @@ const VerifyCode = () => {
 
 			<View style={styles.timerContainer}>
 				{timer > 0 ? (
-					<Text style={styles.timerText}>Call available in {formatTimer(timer)}</Text>
+					<Text style={styles.timerText}>Resend available in {formatTimer(timer)}</Text>
 				) : (
 					<View style={styles.actionContainer}>
 						<TouchableOpacity
 							onPress={handleResendCode}
 							style={styles.resendButton}>
 							<Text style={styles.resendText}>Resend code</Text>
-						</TouchableOpacity>
-						<Text style={styles.separator}>•</Text>
-						<TouchableOpacity onPress={handleCall}>
-							<Text style={styles.callText}>Call me instead</Text>
 						</TouchableOpacity>
 					</View>
 				)}
@@ -299,6 +259,7 @@ const styles = StyleSheet.create({
 		marginBottom: 30,
 	},
 	timerText: {
+		textAlign: "center",
 		fontSize: 16,
 		color: colors.textSecondary,
 	},

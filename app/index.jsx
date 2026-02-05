@@ -3,7 +3,9 @@ import { useRouter } from "expo-router";
 import { useState } from "react";
 import { Alert, Keyboard, KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import config from "../config/config";
 import { colors } from "../constants/colors";
+const API_BASE_URL = config.apiBaseUrl;
 
 const Login = () => {
 	const router = useRouter();
@@ -11,46 +13,36 @@ const Login = () => {
 	const [phone, setPhone] = useState("");
 	const [showPicker, setShowPicker] = useState(false);
 
-	const countryCodes = [
-		{ label: "🇵🇰 Pakistan +92", value: "+92" },
-		{ label: "🇺🇸 USA +1", value: "+1" },
-		{ label: "🇮🇳 India +91", value: "+91" },
-	];
+	const countryCodes = [{ label: "🇵🇰 Pakistan +92", value: "+92" }];
 
-	const handleContinue = () => {
-		if (phone.length === 0) {
+	const numberWithPlus = countryCode + phone;
+	const number = numberWithPlus.slice(1);
+
+	const handleContinue = async () => {
+		if (phone.length === 0 || phone.length > 11 || !/^[1-9]\d{7,14}$/.test(number)) {
 			Alert.alert("Please enter a valid phone number.");
 			return;
 		}
-
-		// TODO: Implement actual authentication API call here
-		// fetch("https://example.com/api/auth/otp", {
-		// 	method: "POST",
-		// 	headers: {
-		// 		"Content-Type": "application/json",
-		// 	},
-		// 	body: JSON.stringify({ number: countryCode + phone }),
-		// })
-		// 	.then((response) => response.json())
-		// 	.then((data) => {
-		// 		if (data.success) {
-		// 			router.replace("/otp");
-		// 		} else {
-		// 			Alert.alert("Error", "Failed to send OTP. Please try again.");
-		// 		}
-		// 	})
-		// 	.catch((error) => {
-		// 		console.error("Error sending OTP:", error);
-		// 		Alert.alert("Error", "An unexpected error occurred. Please try again.");
-		// 	});
-
-		console.log("Continue with phone number:", countryCode + phone);
-
-		// Navigate to the main app (tabs)
-		router.replace({
-			pathname: "/otp",
-			params: { phone: countryCode + phone },
-		});
+		console.log("Requesting OTP for:", number);
+		try {
+			const response = await fetch(`${API_BASE_URL}/auth/otp`, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({ number: number }),
+			});
+			const data = await response.json();
+			if (data.success) {
+				router.replace({ pathname: "/otp", params: { phone: number } });
+			} else {
+				Alert.alert("Error", "Failed to send OTP. Please try again.");
+				console.error("OTP request failed:", data.message);
+			}
+		} catch (error) {
+			console.error("Error sending OTP:", error);
+			Alert.alert("Error", "An unexpected error occurred. Please try again.");
+		}
 	};
 
 	const selectCountryCode = (code) => {
@@ -58,14 +50,12 @@ const Login = () => {
 		setShowPicker(false);
 	};
 
-	// Get the selected country display text with flag
 	const getSelectedCountryDisplay = () => {
 		const selected = countryCodes.find((c) => c.value === countryCode);
 		if (selected) {
-			// Extract flag and code (e.g., "🇵🇰 +92" from "🇵🇰 Pakistan +92")
 			const parts = selected.label.split(" ");
 			if (parts.length >= 3) {
-				return `${parts[0]} ${parts[parts.length - 1]}`; // Flag + Code
+				return `${parts[0]} ${parts[parts.length - 1]}`;
 			}
 			return selected.label;
 		}
@@ -156,7 +146,7 @@ const Login = () => {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: colors.background, // similar to screenshot
+		backgroundColor: colors.background,
 		paddingHorizontal: 20,
 		justifyContent: "center",
 	},
@@ -269,7 +259,6 @@ const styles = StyleSheet.create({
 		marginTop: "auto",
 		marginBottom: 40,
 	},
-
 	buttonDisabled: {
 		backgroundColor: colors.navInactive,
 		opacity: 1,
@@ -281,5 +270,4 @@ const styles = StyleSheet.create({
 		fontWeight: "bold",
 	},
 });
-
 export default Login;
