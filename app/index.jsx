@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { Alert, Keyboard, KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
+import { ActivityIndicator, Alert, Keyboard, KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import config from "../config/config";
 import { colors } from "../constants/colors";
@@ -12,17 +12,21 @@ const Login = () => {
 	const [countryCode, setCountryCode] = useState("+92");
 	const [phone, setPhone] = useState("");
 	const [showPicker, setShowPicker] = useState(false);
+	const [loading, setLoading] = useState(false);
 
 	const countryCodes = [{ label: "🇵🇰 Pakistan +92", value: "+92" }];
 
 	const numberWithPlus = countryCode + phone;
 	const number = numberWithPlus.slice(1);
 
+	const isValidPhone = phone.length > 0 && phone.length <= 11 && /^[1-9]\d{7,14}$/.test(number);
+
 	const handleContinue = async () => {
-		if (phone.length === 0 || phone.length > 11 || !/^[1-9]\d{7,14}$/.test(number)) {
+		if (!isValidPhone) {
 			Alert.alert("Please enter a valid phone number.");
 			return;
 		}
+		setLoading(true);
 		console.log("Requesting OTP for:", number);
 		try {
 			const response = await fetch(`${API_BASE_URL}/auth/otp`, {
@@ -42,6 +46,8 @@ const Login = () => {
 		} catch (error) {
 			console.error("Error sending OTP:", error);
 			Alert.alert("Error", "An unexpected error occurred. Please try again.");
+		} finally {
+			setLoading(false);
 		}
 	};
 
@@ -127,15 +133,21 @@ const Login = () => {
 					</View>
 
 					<TouchableOpacity
-						style={[styles.button, phone.length === 0 && styles.buttonDisabled]}
-						disabled={phone.length === 0}
+						style={[styles.button, (!isValidPhone || loading) && styles.buttonDisabled]}
+						disabled={!isValidPhone || loading}
 						onPress={handleContinue}>
-						<Text style={styles.buttonText}>Continue</Text>
-						<Ionicons
-							name="arrow-forward"
-							size={19}
-							color={"#fff"}
-						/>
+						{loading ? (
+							<ActivityIndicator color="#fff" />
+						) : (
+							<>
+								<Text style={styles.buttonText}>Continue</Text>
+								<Ionicons
+									name="arrow-forward"
+									size={19}
+									color={"#fff"}
+								/>
+							</>
+						)}
 					</TouchableOpacity>
 				</SafeAreaView>
 			</TouchableWithoutFeedback>

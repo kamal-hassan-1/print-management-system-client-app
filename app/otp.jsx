@@ -2,7 +2,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { useEffect, useRef, useState } from "react";
-import { Alert, Modal, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Alert, Modal, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import config from "../config/config";
 import { colors } from "../constants/colors";
@@ -17,6 +17,8 @@ const VerifyCode = () => {
 	const [codes, setCodes] = useState(["", "", "", "", ""]);
 	const [timer, setTimer] = useState(30);
 	const [showErrorModal, setShowErrorModal] = useState(false);
+	const [verifying, setVerifying] = useState(false);
+	const [resending, setResending] = useState(false);
 	const inputRefs = useRef([]);
 
 	//--------------------------------------------- TIMER COUNTDOWN ------------------------------------------------//
@@ -39,7 +41,7 @@ const VerifyCode = () => {
 			inputRefs.current[index + 1]?.focus();
 		}
 		// Auto-verify when all 5 digits are entered
-		if (newCodes.every((code) => code !== "") && index === 4) {
+		if (newCodes.every((code) => code !== "") && index === 4 && !verifying) {
 			handleVerify(newCodes.join(""));
 		}
 	};
@@ -51,6 +53,8 @@ const VerifyCode = () => {
 	};
 
 	const handleVerify = async (code) => {
+		if (verifying) return;
+		setVerifying(true);
 		try {
 			const response = await fetch(`${API_BASE_URL}/auth/verify-otp`, {
 				method: "POST",
@@ -69,11 +73,14 @@ const VerifyCode = () => {
 		} catch (error) {
 			console.error("Error verifying OTP:", error);
 			setShowErrorModal(true);
+		} finally {
+			setVerifying(false);
 		}
 	};
 
 	const handleResendCode = async () => {
-		if (timer > 0) return;
+		if (timer > 0 || resending) return;
+		setResending(true);
 		try {
 			const response = await fetch(`${API_BASE_URL}/auth/otp`, {
 				method: "POST",
@@ -84,7 +91,9 @@ const VerifyCode = () => {
 			});
 			const data = await response.json();
 			if (data.success) {
-				router.replace({ pathname: "/otp", params: { phone: phoneNumber } });
+				setCodes(["", "", "", "", ""]);
+				setTimer(30);
+				inputRefs.current[0]?.focus();
 			} else {
 				Alert.alert("Error", "Failed to send OTP. Please try again.");
 				console.error("OTP request failed:", data.message);
@@ -92,7 +101,15 @@ const VerifyCode = () => {
 		} catch (error) {
 			console.error("Error sending OTP:", error);
 			Alert.alert("Error", "An unexpected error occurred. Please try again.");
+		} finally {
+			setResending(false);
 		}
+	};
+
+	const handleClearAndRetry = () => {
+		setShowErrorModal(false);
+		setCodes(["", "", "", "", ""]);
+		inputRefs.current[0]?.focus();
 	};
 
 	const formatTimer = (seconds) => {
@@ -116,7 +133,7 @@ const VerifyCode = () => {
 			<Text style={styles.title}>Enter verification code</Text>
 
 			<View style={styles.instructionContainer}>
-				<Text style={styles.instructionText}>We&apos;ve sent it to {phoneNumber} via</Text>
+				<Text style={styles.instructionText}>We&apos;ve sent it to +{phoneNumber} via</Text>
 				<View style={styles.whatsappContainer}>
 					<Ionicons
 						name="logo-whatsapp"
@@ -151,8 +168,13 @@ const VerifyCode = () => {
 					<View style={styles.actionContainer}>
 						<TouchableOpacity
 							onPress={handleResendCode}
-							style={styles.resendButton}>
-							<Text style={styles.resendText}>Resend code</Text>
+							style={styles.resendButton}
+							disabled={resending}>
+							{resending ? (
+								<ActivityIndicator color={colors.textPrimary} size="small" />
+							) : (
+								<Text style={styles.resendText}>Resend code</Text>
+							)}
 						</TouchableOpacity>
 					</View>
 				)}
@@ -181,10 +203,7 @@ const VerifyCode = () => {
 
 						<TouchableOpacity
 							style={styles.errorTryAgainButton}
-							onPress={() => {
-								setShowErrorModal(false);
-								handleResendCode();
-							}}>
+							onPress={handleClearAndRetry}>
 							<Text style={styles.errorTryAgainText}>Try again</Text>
 							<Ionicons
 								name="arrow-forward"
@@ -273,17 +292,6 @@ const styles = StyleSheet.create({
 		paddingVertical: 5,
 	},
 	resendText: {
-		fontSize: 16,
-		color: colors.textPrimary,
-		fontWeight: "600",
-		textDecorationLine: "underline",
-	},
-	separator: {
-		fontSize: 16,
-		color: "rgba(255, 255, 255, 0.6)",
-		marginHorizontal: 5,
-	},
-	callText: {
 		fontSize: 16,
 		color: colors.textPrimary,
 		fontWeight: "600",
