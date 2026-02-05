@@ -1,3 +1,6 @@
+
+//----------------------------------- IMPORTS -----------------------------------//
+
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
@@ -5,7 +8,12 @@ import { ActivityIndicator, Alert, Keyboard, KeyboardAvoidingView, StyleSheet, T
 import { SafeAreaView } from "react-native-safe-area-context";
 import config from "../config/config";
 import { colors } from "../constants/colors";
+
+//----------------------------------- CONSTANTS -----------------------------------//
+
 const API_BASE_URL = config.apiBaseUrl;
+
+//----------------------------------- COMPONENT -----------------------------------//
 
 const Login = () => {
 	const router = useRouter();
@@ -67,6 +75,8 @@ const Login = () => {
 		}
 		return countryCode;
 	};
+
+//----------------------------------- RENDER -----------------------------------//
 
 	return (
 		<KeyboardAvoidingView
@@ -154,6 +164,8 @@ const Login = () => {
 		</KeyboardAvoidingView>
 	);
 };
+
+//----------------------------------- Styles -----------------------------------//
 
 const styles = StyleSheet.create({
 	container: {

@@ -1,3 +1,6 @@
+
+//----------------------------------- IMPORTS -----------------------------------//
+
 import { Feather } from "@expo/vector-icons";
 import { useMemo, useState } from "react";
 import { ActivityIndicator, Modal, RefreshControl, ScrollView, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
@@ -6,11 +9,11 @@ import TransactionList from "../../components/TransactionList";
 import { colors } from "../../constants/colors";
 import { useTransactions } from "../../hooks/useTransactions";
 
+//----------------------------------- COMPONENT -----------------------------------//
+
 const PrintHistory = () => {
-	// Fetch transactions from backend
 	const { transactions: backendTransactions, loading, error, refreshing, refresh } = useTransactions();
 
-	// Filter states
 	const [filterModalVisible, setFilterModalVisible] = useState(false);
 	const [sortModalVisible, setSortModalVisible] = useState(false);
 	const [dateFrom, setDateFrom] = useState("");
@@ -18,11 +21,9 @@ const PrintHistory = () => {
 	const [sortBy, setSortBy] = useState("date");
 	const [sortOrder, setSortOrder] = useState("desc");
 
-	// Filter and sort transactions
 	const filteredAndSortedTransactions = useMemo(() => {
 		let filtered = [...backendTransactions];
 
-		// Filter by date range - with date validation
 		if (dateFrom) {
 			const fromDate = new Date(dateFrom);
 			if (!isNaN(fromDate.getTime())) {
@@ -36,20 +37,17 @@ const PrintHistory = () => {
 			}
 		}
 
-		// Sort
 		filtered.sort((a, b) => {
 			let comparison = 0;
 
 			switch (sortBy) {
 				case "date":
-					// Use timestamp for accurate sorting
 					comparison = new Date(a.timestamp) - new Date(b.timestamp);
 					break;
 				case "price":
 					comparison = a.amount - b.amount;
 					break;
 				case "printSize":
-					// Add null/undefined checks
 					const sizeA = a.printSize || "";
 					const sizeB = b.printSize || "";
 					comparison = sizeA.localeCompare(sizeB);
@@ -77,7 +75,8 @@ const PrintHistory = () => {
 		return count;
 	};
 
-	// Loading state
+//----------------------------------- RENDER -----------------------------------//
+
 	if (loading) {
 		return (
 			<SafeAreaView
@@ -101,7 +100,6 @@ const PrintHistory = () => {
 		);
 	}
 
-	// Error state
 	if (error) {
 		return (
 			<SafeAreaView
@@ -140,12 +138,12 @@ const PrintHistory = () => {
 				backgroundColor={colors.background}
 			/>
 
-			{/* Header */}
 			<View style={styles.header}>
 				<Text style={styles.headerTitle}>Print History</Text>
 			</View>
 
 			{/* Filter and Sort Bar */}
+
 			<View style={styles.filterBar}>
 				<TouchableOpacity
 					style={styles.filterButton}
@@ -184,6 +182,7 @@ const PrintHistory = () => {
 			</View>
 
 			{/* Transaction List */}
+
 			<ScrollView
 				style={styles.scrollView}
 				contentContainerStyle={styles.scrollContent}
@@ -211,6 +210,7 @@ const PrintHistory = () => {
 			</ScrollView>
 
 			{/* Filter Modal */}
+
 			<Modal
 				visible={filterModalVisible}
 				animationType="slide"
@@ -230,6 +230,7 @@ const PrintHistory = () => {
 						</View>
 
 						{/* Date Range Filter */}
+
 						<View style={styles.filterSection}>
 							<Text style={styles.filterLabel}>Date Range</Text>
 							<View style={styles.dateInputs}>
@@ -257,6 +258,7 @@ const PrintHistory = () => {
 						</View>
 
 						{/* Apply Button */}
+
 						<TouchableOpacity
 							style={styles.applyButton}
 							onPress={() => setFilterModalVisible(false)}>
@@ -267,6 +269,7 @@ const PrintHistory = () => {
 			</Modal>
 
 			{/* Sort Modal */}
+
 			<Modal
 				visible={sortModalVisible}
 				animationType="slide"
@@ -290,10 +293,8 @@ const PrintHistory = () => {
 							style={styles.sortOption}
 							onPress={() => {
 								if (sortBy === "date") {
-									// Toggle order if already on this sort type
 									setSortOrder(sortOrder === "desc" ? "asc" : "desc");
 								} else {
-									// Switch to this sort type with default desc order
 									setSortBy("date");
 									setSortOrder("desc");
 								}
@@ -319,10 +320,8 @@ const PrintHistory = () => {
 							style={styles.sortOption}
 							onPress={() => {
 								if (sortBy === "price") {
-									// Toggle order if already on this sort type
 									setSortOrder(sortOrder === "desc" ? "asc" : "desc");
 								} else {
-									// Switch to this sort type with default desc order
 									setSortBy("price");
 									setSortOrder("desc");
 								}
@@ -348,10 +347,8 @@ const PrintHistory = () => {
 							style={styles.sortOption}
 							onPress={() => {
 								if (sortBy === "printSize") {
-									// Toggle order if already on this sort type
 									setSortOrder(sortOrder === "desc" ? "asc" : "desc");
 								} else {
-									// Switch to this sort type with default desc order
 									setSortBy("printSize");
 									setSortOrder("desc");
 								}
@@ -374,6 +371,7 @@ const PrintHistory = () => {
 						</TouchableOpacity>
 
 						{/* Apply Button */}
+						
 						<TouchableOpacity
 							style={styles.applyButton}
 							onPress={() => setSortModalVisible(false)}>
@@ -385,6 +383,8 @@ const PrintHistory = () => {
 		</SafeAreaView>
 	);
 };
+
+//----------------------------------- STYLES -----------------------------------//
 
 const styles = StyleSheet.create({
 	container: {

@@ -1,9 +1,14 @@
+
+//----------------------------------- IMPORTS -----------------------------------//
+
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { Animated, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { colors } from "../constants/colors";
+
+//----------------------------------- COMPONENT -----------------------------------//
 
 const ProfileSetup = () => {
 	const router = useRouter();
@@ -45,12 +50,10 @@ const ProfileSetup = () => {
 			setError("Please enter your name");
 			return;
 		}
-
 		if (userName.trim().length < 2) {
 			setError("Name must be at least 2 characters");
 			return;
 		}
-
 		setError("");
 		setLoading(true);
 
@@ -67,8 +70,6 @@ const ProfileSetup = () => {
 			}),
 		]).start();
 
-        
-		
 		try {
 			const response = await fetch(`${config.apiBaseUrl}/user`, {
 				method: "PATCH",
@@ -116,6 +117,8 @@ const ProfileSetup = () => {
 		inputRange: [0, 50],
 		outputRange: [1, 0.95],
 	});
+
+//----------------------------------- RENDER -----------------------------------//
 
 	return (
 		<SafeAreaView style={styles.container}>
@@ -236,6 +239,8 @@ const ProfileSetup = () => {
 		</SafeAreaView>
 	);
 };
+
+//----------------------------------- STYLES -----------------------------------//
 
 const styles = StyleSheet.create({
 	container: {

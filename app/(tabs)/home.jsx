@@ -50,7 +50,6 @@ const HomePage = () => {
 						onRefresh={refresh}
 					/>
 				}>
-				{/* Top Cards Section */}
 
 				<View style={styles.topCardsContainer}>
 					<View style={styles.cardsRow}>

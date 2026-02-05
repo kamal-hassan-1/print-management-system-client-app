@@ -1,3 +1,6 @@
+
+//----------------------------------- IMPORTS -----------------------------------//
+
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
@@ -6,7 +9,11 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import config from "../config/config";
 import { colors } from "../constants/colors";
 
+//----------------------------------- CONSTANTS -----------------------------------//
+
 const API_BASE_URL = config.apiBaseUrl;
+
+//----------------------------------- COMPONENT -----------------------------------//
 
 const NewPrint = () => {
 	const router = useRouter();
@@ -55,6 +62,8 @@ const NewPrint = () => {
 		console.log("Continuing with shop:", shop);
 		router.push({ pathname: "/upload-document", params: { shopId: selectedShop } });
 	};
+
+//----------------------------------- RENDER -----------------------------------//
 
 	return (
 		<SafeAreaView
@@ -190,6 +199,8 @@ const ShopCard = ({ shop, isSelected, onSelect }) => {
 		</TouchableOpacity>
 	);
 };
+
+//----------------------------------- STYLES -----------------------------------//
 
 const styles = StyleSheet.create({
 	container: {

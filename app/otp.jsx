@@ -1,3 +1,6 @@
+
+//----------------------------------- IMPORTS -----------------------------------//
+
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
@@ -7,7 +10,11 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import config from "../config/config";
 import { colors } from "../constants/colors";
 
+//----------------------------------- CONSTANTS -----------------------------------//
+
 const API_BASE_URL = config.apiBaseUrl;
+
+//----------------------------------- COMPONENT -----------------------------------//
 
 const VerifyCode = () => {
 	const router = useRouter();
@@ -15,13 +22,11 @@ const VerifyCode = () => {
 	const phoneNumber = params.phone;
 
 	const [codes, setCodes] = useState(["", "", "", "", ""]);
-	const [timer, setTimer] = useState(30);
+	const [timer, setTimer] = useState(90);
 	const [showErrorModal, setShowErrorModal] = useState(false);
 	const [verifying, setVerifying] = useState(false);
 	const [resending, setResending] = useState(false);
 	const inputRefs = useRef([]);
-
-	//--------------------------------------------- TIMER COUNTDOWN ------------------------------------------------//
 
 	useEffect(() => {
 		if (timer > 0) {
@@ -40,7 +45,7 @@ const VerifyCode = () => {
 		if (value && index < 4) {
 			inputRefs.current[index + 1]?.focus();
 		}
-		// Auto-verify when all 5 digits are entered
+		// auto verify when all 5 digits
 		if (newCodes.every((code) => code !== "") && index === 4 && !verifying) {
 			handleVerify(newCodes.join(""));
 		}
@@ -56,16 +61,17 @@ const VerifyCode = () => {
 		if (verifying) return;
 		setVerifying(true);
 		try {
-			const response = await fetch(`${API_BASE_URL}/auth/verify-otp`, {
+			const response = await fetch(`${API_BASE_URL}/auth/verify`, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
 				},
-				body: JSON.stringify({ code, phoneNumber }),
+				body: JSON.stringify({ code, number: phoneNumber }),
 			});
-			const data = await response.json();
-			if (data.success) {
-				await SecureStore.setItemAsync("authToken", data.token);
+			const body = await response.json();
+			console.log(body);
+			if (body.success) {
+				await SecureStore.setItemAsync("authToken", body.data.token);
 				router.replace({ pathname: "/profile-setup" });
 			} else {
 				setShowErrorModal(true);
@@ -117,6 +123,8 @@ const VerifyCode = () => {
 		const secs = seconds % 60;
 		return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
 	};
+
+//----------------------------------- RENDER -----------------------------------//
 
 	return (
 		<SafeAreaView style={styles.container}>
@@ -217,6 +225,8 @@ const VerifyCode = () => {
 		</SafeAreaView>
 	);
 };
+
+//----------------------------------- STYLES -----------------------------------//
 
 const styles = StyleSheet.create({
 	container: {

@@ -7,6 +7,7 @@ export default function Layout() {
 	const insets = useSafeAreaInsets();
 
 	return (
+		// main tab component and styling
 		<Tabs
 			screenOptions={{
 				headerShown: false,
