@@ -53,6 +53,7 @@ const ProfileSetup = () => {
 
 		setError("");
 		setLoading(true);
+
 		Animated.sequence([
 			Animated.timing(buttonScaleAnim, {
 				toValue: 0.95,
@@ -66,43 +67,44 @@ const ProfileSetup = () => {
 			}),
 		]).start();
 
-        setSuccess(true);
-		router.replace("/(tabs)/home");
-		// try {
-		// 	const response = await fetch(`${config.apiBaseUrl}/api/user/profile`, {
-		// 		method: "POST",
-		// 		headers: {
-		// 			"Content-Type": "application/json",
-		// 		},
-		// 		body: JSON.stringify({
-		// 			displayName: userName.trim(),
-		// 		}),
-		// 	});
+        
+		
+		try {
+			const response = await fetch(`${config.apiBaseUrl}/user`, {
+				method: "PATCH",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					name: userName.trim(),
+				}),
+			});
 
-		// 	const data = await response.json();
+			const data = await response.json();
 
-		// 	if (response.ok) {
-		// 		// Success animation
-		// 		setSuccess(true);
-		// 		Animated.timing(checkmarkAnim, {
-		// 			toValue: 1,
-		// 			duration: 600,
-		// 			useNativeDriver: true,
-		// 		}).start();
+			if (response.ok) {
+				setSuccess(true);
 
-		// 		// Navigate after delay
-		// 		setTimeout(() => {
-		// 			router.replace("/(tabs)/home");
-		// 		}, 1500);
-		// 	} else {
-		// 		setError(data.message || "Failed to save profile");
-		// 		setLoading(false);
-		// 	}
-		// } catch (err) {
-		// 	console.error("Profile setup error:", err);
-		// 	setError("Connection error. Please check your internet and try again.");
-		// 	setLoading(false);
-		// }
+				// Success animation
+				Animated.timing(checkmarkAnim, {
+					toValue: 1,
+					duration: 600,
+					useNativeDriver: true,
+				}).start();
+
+				// Navigate after delay
+				setTimeout(() => {
+					router.replace("/(tabs)/home");
+				}, 1500);
+			} else {
+				setError(data.message || "Failed to save profile");
+				setLoading(false);
+			}
+		} catch (err) {
+			console.error("Profile setup error:", err);
+			setError("Connection error. Please check your internet and try again.");
+			setLoading(false);
+		}
 	};
 
 	const handleInputChange = (text) => {
