@@ -122,7 +122,7 @@ const NewPrint = () => {
 						{shops.map((shop) => {
 							return (
 								<ShopCard
-									key={shop._id || shop.id || Math.random()} // Fallback key to prevent crash while debugging
+									key={shop._id || shop.id} // Fallback key to prevent crash while debugging
 									shop={shop}
 									isSelected={selectedShop && (selectedShop === shop._id || selectedShop === shop.id)}
 									onSelect={() => handleShopSelect(shop)}
