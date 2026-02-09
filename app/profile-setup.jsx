@@ -9,6 +9,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import config from "../config/config";
 import { colors } from "../constants/colors";
 
+//----------------------------------- CONSTANTS -----------------------------------//
+
 const API_BASE_URL = config.apiBaseUrl;
 
 //----------------------------------- COMPONENT -----------------------------------//
