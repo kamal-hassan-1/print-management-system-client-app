@@ -1,4 +1,3 @@
-
 //----------------------------------- IMPORTS -----------------------------------//
 
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -7,7 +6,7 @@ import * as SecureStore from "expo-secure-store";
 import { useEffect, useRef, useState } from "react";
 import { Animated, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { config } from "../config/config";
+import config from "../config/config";
 import { colors } from "../constants/colors";
 
 const API_BASE_URL = config.apiBaseUrl;
@@ -125,7 +124,7 @@ const ProfileSetup = () => {
 		outputRange: [1, 0.95],
 	});
 
-//----------------------------------- RENDER -----------------------------------//
+	//----------------------------------- RENDER -----------------------------------//
 
 	return (
 		<SafeAreaView style={styles.container}>
