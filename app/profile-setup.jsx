@@ -3,10 +3,14 @@
 
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import * as SecureStore from "expo-secure-store";
 import { useEffect, useRef, useState } from "react";
 import { Animated, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { config } from "../config/config";
 import { colors } from "../constants/colors";
+
+const API_BASE_URL = config.apiBaseUrl;
 
 //----------------------------------- COMPONENT -----------------------------------//
 
@@ -46,6 +50,8 @@ const ProfileSetup = () => {
 	}, [opacityAnim, scaleAnim, slideAnim]);
 
 	const handleSubmit = async () => {
+		const token = await SecureStore.getItemAsync("authToken");
+		console.log(token);
 		if (!userName.trim()) {
 			setError("Please enter your name");
 			return;
@@ -71,10 +77,11 @@ const ProfileSetup = () => {
 		]).start();
 
 		try {
-			const response = await fetch(`${config.apiBaseUrl}/user`, {
+			const response = await fetch(`${API_BASE_URL}/user`, {
 				method: "PATCH",
 				headers: {
 					"Content-Type": "application/json",
+					Authorization: `Bearer ${token}`,
 				},
 				body: JSON.stringify({
 					name: userName.trim(),

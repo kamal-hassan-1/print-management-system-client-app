@@ -72,7 +72,7 @@ const VerifyCode = () => {
 			console.log(body);
 			if (body.success) {
 				await SecureStore.setItemAsync("authToken", body.data.token);
-				router.replace({ pathname: "/profile-setup" });
+				router.replace("/profile-setup");
 			} else {
 				setShowErrorModal(true);
 			}
