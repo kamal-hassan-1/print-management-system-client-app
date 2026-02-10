@@ -24,6 +24,7 @@ const fetchUserName = async () => {
 			},
 		});
 		const body = await response.json();
+		console.log(body);
 		if (response.status === 200) {
 			const name = body?.data?.profile?.name ?? "John Doe";
 			return name;

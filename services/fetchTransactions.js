@@ -1,11 +1,17 @@
+// to do in this services
+
 import config from "../config/config";
-const API_BASE_URL = config.apiBaseUrl;
+import * as SecureStore from "expo-secure-store";
+
+const API_BASE_URL = config.apiBaseUrl;	
 
 const api = async (url, options = {}) => {
+	const token = await SecureStore.getItemAsync("token");
 	const finalOptions = {
 		...options,
 		headers: {
 			"Content-Type": "application/json",
+			Authorization: `Bearer ${token}`,
 			...(options.headers || {}),
 		},
 	};
@@ -20,23 +26,13 @@ const api = async (url, options = {}) => {
 // Fetch all transactions
 export const fetchTransactions = async () => {
 	try {
-		const data = await api("/transactions");
+		const data = await api("/history");
 		return data.data;
 	} catch (error) {
-		console.error("Error fetching transactions:", error);
-		throw error;
-	}
-};
-
-// Fetch transactions with filters
-export const fetchFilteredTransactions = async (filters = {}) => {
-	try {
-		const queryString = new URLSearchParams(filters).toString();
-		const data = await api(`/transactions?${queryString}`);
-		return data.data;
-	} catch (error) {
-		console.error("Error fetching filtered transactions:", error);
-		throw error;
+		console.log("Error fetching transactions:", error);
+		//--------------------------------------------------------delete line 26 add line 28 and 29
+		//console.error("Error fetching transactions:", error);
+		// throw error;
 	}
 };
 export default api;

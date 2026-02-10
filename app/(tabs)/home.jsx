@@ -23,14 +23,15 @@ const HomePage = () => {
 	}
 
 	if (error) {
-		return (
-			<View style={styles.centerContainer}>
-				<Text style={styles.errorText}>Error loading transactions</Text>
-				<TouchableOpacity onPress={refresh} style={styles.retryButton}>
-					<Text style={styles.retryText}>Retry</Text>
-				</TouchableOpacity>
-			</View>
-		);
+		// return (
+		// 	<View style={styles.centerContainer}>
+		// 		<Text style={styles.errorText}>Error loading transactions</Text>
+		// 		<TouchableOpacity onPress={refresh} style={styles.retryButton}>
+		// 			<Text style={styles.retryText}>Retry</Text>
+		// 		</TouchableOpacity>
+		// 	</View>
+		// );
+		Alert.alert("Error loading transactions");
 	}
 	return (
 		<SafeAreaView

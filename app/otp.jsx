@@ -69,9 +69,9 @@ const VerifyCode = () => {
 				body: JSON.stringify({ code, number: phoneNumber }),
 			});
 			const body = await response.json();
-			console.log(body);
 			if (body.success) {
 				await SecureStore.setItemAsync("authToken", body.data.token);
+				console.log("OTP verified successfully for", phoneNumber);
 				router.replace("/profile-setup");
 			} else {
 				setShowErrorModal(true);

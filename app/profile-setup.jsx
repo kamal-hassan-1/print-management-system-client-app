@@ -52,7 +52,7 @@ const ProfileSetup = () => {
 
 	const handleSubmit = async () => {
 		const token = await SecureStore.getItemAsync("authToken");
-		console.log(token);
+		
 		if (!userName.trim()) {
 			setError("Please enter your name");
 			return;
@@ -78,7 +78,7 @@ const ProfileSetup = () => {
 		]).start();
 
 		try {
-			const response = await fetch(`${API_BASE_URL}/user`, {
+			const response = await fetch(`${API_BASE_URL}/profile`, {
 				method: "PATCH",
 				headers: {
 					"Content-Type": "application/json",
@@ -88,9 +88,8 @@ const ProfileSetup = () => {
 					name: userName.trim(),
 				}),
 			});
-
 			const data = await response.json();
-
+			console.log(data);
 			if (response.ok) {
 				setSuccess(true);
 
