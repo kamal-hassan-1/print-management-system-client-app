@@ -41,6 +41,7 @@ const UploadDocument = () => {
             setLoading(true);
 
             const result = await DocumentPicker.getDocumentAsync({
+				multiple: true,
                 type: ["application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "text/plain", "image/jpeg", "image/png", "image/jpg"],
                 copyToCacheDirectory: true,
             });
