@@ -9,7 +9,7 @@ import TransactionList from "../../components/TransactionList";
 import { colors } from "../../constants/colors";
 import { useTransactions } from "../../hooks/useTransactions";
 
-//----------------------------------- COMPONENT -----------------------------------//
+//----------------------------------- COMPONENTS -----------------------------------//
 
 const PrintHistory = () => {
 	const { transactions: backendTransactions, loading, error, refreshing, refresh } = useTransactions();

@@ -1,3 +1,6 @@
+
+//----------------------------------- IMPORTS -----------------------------------//
+
 import { Feather } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
@@ -7,7 +10,11 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import config from "../config/config";
 import { colors } from "../constants/colors";
 
+//----------------------------------- CONSTANTS -----------------------------------//
+
 const API_BASE_URL = config.apiBaseUrl;
+
+//----------------------------------- COMPONENTS -----------------------------------//
 
 const PrintSettings = () => {
 	const router = useRouter();
@@ -172,6 +179,8 @@ const PrintSettings = () => {
 			</View>
 		</View>
 	);
+
+//----------------------------------- RENDER -----------------------------------//
 
 	return (
 		<SafeAreaView
@@ -381,6 +390,8 @@ const PrintSettings = () => {
 		</SafeAreaView>
 	);
 };
+
+//----------------------------------- STYLES -----------------------------------//
 
 const styles = StyleSheet.create({
 	container: {

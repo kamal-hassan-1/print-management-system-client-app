@@ -14,7 +14,7 @@ import { colors } from "../constants/colors";
 
 const API_BASE_URL = config.apiBaseUrl;
 
-//----------------------------------- COMPONENT -----------------------------------//
+//----------------------------------- COMPONENTS -----------------------------------//
 
 const VerifyCode = () => {
 	const router = useRouter();

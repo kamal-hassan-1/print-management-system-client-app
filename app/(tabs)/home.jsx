@@ -1,3 +1,6 @@
+
+//----------------------------------- IMPORTS -----------------------------------//
+
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { ActivityIndicator, Alert, Dimensions, RefreshControl, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from "react-native";
@@ -6,7 +9,12 @@ import TransactionList from "../../components/TransactionList";
 import { colors } from "../../constants/colors";
 import { useTransactions } from "../../hooks/useTransactions";
 
+
+//----------------------------------- CONSTANTS -----------------------------------//
+
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
+
+//----------------------------------- COMPONENTS -----------------------------------//
 
 const HomePage = () => {
 	const router = useRouter();
@@ -124,7 +132,7 @@ const HomePage = () => {
 	);
 };
 
-//----------------------------------- Styles -----------------------------------//
+//----------------------------------- STYLES -----------------------------------//
 
 const styles = StyleSheet.create({
 	container: {

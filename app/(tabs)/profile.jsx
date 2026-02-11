@@ -53,6 +53,8 @@ const Profile = () => {
 		]);
 	};
 
+//----------------------------------- STYLES -----------------------------------//
+
 	return (
 		<SafeAreaView
 			style={styles.container}
@@ -206,6 +208,8 @@ const Profile = () => {
 		</SafeAreaView>
 	);
 };
+
+//----------------------------------- STYLES -----------------------------------//
 
 const styles = StyleSheet.create({
 	container: {
