@@ -18,3 +18,8 @@ This app acts as the **Primary Actor Interface** in a distributed system:
 - **State:** React Context API / Hooks
 - **Real-time:** Socket.io-client
 - **API:** Axios (REST)
+
+
+
+## hash the files
+- **expo-crypto:** To generate the SHA-256 hash

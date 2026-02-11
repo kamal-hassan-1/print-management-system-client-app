@@ -1,4 +1,3 @@
-
 //----------------------------------- IMPORTS -----------------------------------//
 
 import { Feather } from "@expo/vector-icons";
@@ -9,251 +8,263 @@ import { ActivityIndicator, Alert, ScrollView, StatusBar, StyleSheet, Text, Text
 import { SafeAreaView } from "react-native-safe-area-context";
 import { colors } from "../constants/colors";
 
+// Import your service here (Adjust path if needed)
+import { calculateFileHash, checkFileExists, uploadFile } from '../services/fileService'; 
+
 //----------------------------------- COMPONENTS -----------------------------------//
 
 const UploadDocument = () => {
-	const router = useRouter();
-	const params = useLocalSearchParams();
-	const [document, setDocument] = useState(null);
-	const [documentName, setDocumentName] = useState("");
-	const [loading, setLoading] = useState(false);
-	const [error, setError] = useState(null);
+    const router = useRouter();
+    const params = useLocalSearchParams();
+    
+    const [document, setDocument] = useState(null);
+    const [documentName, setDocumentName] = useState("");
+    
+    // 'loading' is for picking the file from phone
+    const [loading, setLoading] = useState(false);
+    // 'isUploading' is for checking/sending file to server
+    const [isUploading, setIsUploading] = useState(false);
+    
+    const [error, setError] = useState(null);
 
-	const shopId = params.shopId;
-	useEffect(() => {
-		if (!shopId) {
-			Alert.alert("Error", "Shop ID not found. Please go back and select a shop.");
-			router.back();
-		}
-	}, [router, shopId]);
+    const shopId = params.shopId;
+    useEffect(() => {
+        if (!shopId) {
+            Alert.alert("Error", "Shop ID not found. Please go back and select a shop.");
+            router.back();
+        }
+    }, [router, shopId]);
 
-	const handleDocumentPick = async () => {
-		try {
-			setError(null);
-			setLoading(true);
+    const handleDocumentPick = async () => {
+        try {
+            setError(null);
+            setLoading(true);
 
-			const result = await DocumentPicker.getDocumentAsync({
-				type: ["application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "text/plain", "image/jpeg", "image/png", "image/jpg"],
-				copyToCacheDirectory: true,
-			});
+            const result = await DocumentPicker.getDocumentAsync({
+                type: ["application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "text/plain", "image/jpeg", "image/png", "image/jpg"],
+                copyToCacheDirectory: true,
+            });
 
-			if (!result.canceled) {
-				const file = result.assets[0];
+            if (!result.canceled) {
+                const file = result.assets[0];
+                const fileName = file.name ? file.name.replace(/\.[^/.]+$/, "") : "Document";
 
-				// Extract filename without extension for display
-				const fileName = file.name ? file.name.replace(/\.[^/.]+$/, "") : "Document";
+                setDocument(file);
+                setDocumentName(fileName);
+                setError(null);
+            }
+        } catch (err) {
+            console.error("Error picking document:", err);
+            setError("Failed to pick document. Please try again.");
+        } finally {
+            setLoading(false);
+        }
+    };
 
-				setDocument(file);
-				setDocumentName(fileName);
-				setError(null);
-			}
-		} catch (err) {
-			console.error("Error picking document:", err);
-			setError("Failed to pick document. Please try again.");
-		} finally {
-			setLoading(false);
-		}
-	};
+    const handleRemoveDocument = () => {
+        setDocument(null);
+        setDocumentName("");
+        setError(null);
+    };
 
-	const handleRemoveDocument = () => {
-		setDocument(null);
-		setDocumentName("");
-		setError(null);
-	};
+    // --- INTEGRATION LOGIC STARTS HERE ---
+    const handleContinue = async () => {
+        if (!document) {
+            Alert.alert("No Document", "Please upload a document to continue.");
+            return;
+        }
+        if (!documentName.trim()) {
+            Alert.alert("Invalid Name", "Please provide a document name.");
+            return;
+        }
 
-	const handleContinue = () => {
-		if (!document) {
-			Alert.alert("No Document", "Please upload a document to continue.");
-			return;
-		}
-		if (!documentName.trim()) {
-			Alert.alert("Invalid Name", "Please provide a document name.");
-			return;
-		}
-		router.push({
-			pathname: "/print-settings",
-			params: {
-				shopId: shopId,
-				documentName: documentName.trim(),
-				documentUri: document.uri,
-				documentSize: document.size,
-				documentMimeType: document.mimeType,
-			},
-		});
-	};
-	const isDocumentUploaded = !!document;
+        setIsUploading(true);
+        setError(null);
+
+        try {
+            // 1. Calculate Hash (Client Side)
+            console.log("Generating hash...");
+            const hash = await calculateFileHash(document.uri);
+            
+            // 2. Check if file exists on Server (Endpoint 1)
+            console.log(`Checking hash: ${hash}`);
+            const exists = await checkFileExists(hash);
+
+            // 3. Upload only if it doesn't exist (Endpoint 2)
+            if (!exists) {
+                console.log("File not found on server. Uploading...");
+                await uploadFile(document);
+            } else {
+                console.log("File already exists. Skipping upload.");
+            }
+
+            // 4. Navigate to Settings (Passing the hash!)
+            router.push({
+                pathname: "/print-settings",
+                params: {
+                    shopId: shopId,
+                    documentName: documentName.trim(),
+                    documentUri: document.uri,
+                    documentSize: document.size,
+                    documentMimeType: document.mimeType,
+                    fileHash: hash, // <--- We pass the hash to the next screen for the final Job API
+                },
+            });
+
+        } catch (err) {
+            console.error("Upload sequence failed:", err);
+            Alert.alert("Upload Failed", "Could not verify or upload your document. Please check your internet connection.");
+            // We do NOT navigate if there is an error
+        } finally {
+            setIsUploading(false);
+        }
+    };
+    // --- INTEGRATION LOGIC ENDS HERE ---
+
+    const isDocumentUploaded = !!document;
 
 //----------------------------------- RENDER -----------------------------------//
 
-	return (
-		<SafeAreaView
-			style={styles.container}
-			edges={["top"]}>
-			<StatusBar
-				barStyle="dark-content"
-				backgroundColor={colors.background}
-			/>
-			<View style={styles.header}>
-				<TouchableOpacity
-					onPress={() => router.back()}
-					style={styles.backButton}>
-					<Feather
-						name="arrow-left"
-						size={24}
-						color={colors.textPrimary}
-					/>
-				</TouchableOpacity>
-				<Text style={styles.headerTitle}>Upload Document</Text>
-				<View style={styles.placeholder} />
-			</View>
-			<ScrollView
-				style={styles.scrollView}
-				contentContainerStyle={styles.scrollContent}>
-				<View style={styles.section}>
-					<Text style={styles.sectionTitle}>Document Upload</Text>
-					<TouchableOpacity
-						style={[styles.uploadArea, isDocumentUploaded && styles.uploadAreaFilled, error && styles.uploadAreaError]}
-						onPress={handleDocumentPick}
-						disabled={loading}>
-						{loading ? (
-							<>
-								<ActivityIndicator
-									size="large"
-									color={colors.primary}
-								/>
-								<Text style={styles.uploadLoadingText}>Processing...</Text>
-							</>
-						) : isDocumentUploaded ? (
-							<>
-								<View style={styles.uploadedIconContainer}>
-									<Feather
-										name="check-circle"
-										size={48}
-										color={colors.primary}
-									/>
-								</View>
-								<Text style={styles.uploadedText}>Document Uploaded</Text>
-								<Text style={styles.uploadedFileName}>{document.name}</Text>
-								<Text style={styles.uploadedFileSize}>({(document.size / 1024).toFixed(2)} KB)</Text>
-							</>
-						) : (
-							<>
-								<Feather
-									name="upload-cloud"
-									size={48}
-									color={colors.primary}
-								/>
-								<Text style={styles.uploadText}>Upload Your Document</Text>
-								<Text style={styles.uploadSubtext}>Tap to select PDF, Word, Excel, or Image files</Text>
-							</>
-						)}
-					</TouchableOpacity>
-					{isDocumentUploaded && (
-						<TouchableOpacity
-							style={styles.changeButton}
-							onPress={handleDocumentPick}>
-							<Feather
-								name="refresh-cw"
-								size={18}
-								color={colors.textPrimary}
-							/>
-							<Text style={styles.changeButtonText}>Change Document</Text>
-						</TouchableOpacity>
-					)}
-					{error && (
-						<View style={styles.errorBox}>
-							<Feather
-								name="alert-circle"
-								size={18}
-								color={colors.printRequest}
-							/>
-							<Text style={styles.errorText}>{error}</Text>
-						</View>
-					)}
-				</View>
-				{isDocumentUploaded && (
-					<View style={styles.section}>
-						<Text style={styles.sectionTitle}>Document Name</Text>
-						<Text style={styles.sectionDescription}>You can edit the document name, but it cannot be empty</Text>
-						<View style={styles.nameInputContainer}>
-							<TextInput
-								style={styles.nameInput}
-								placeholder="Enter document name"
-								placeholderTextColor={colors.textSecondary}
-								value={documentName}
-								onChangeText={setDocumentName}
-								editable={true}
-							/>
-							{documentName.trim() && (
-								<TouchableOpacity
-									onPress={() => setDocumentName("")}
-									style={styles.clearButton}>
-									<Feather
-										name="x"
-										size={20}
-										color={colors.textSecondary}
-									/>
-								</TouchableOpacity>
-							)}
-						</View>
-						{!documentName.trim() && (
-							<Text style={styles.warningText}>
-								<Feather
-									name="info"
-									size={14}
-									color={colors.printRequest}
-								/>{" "}
-								Document name cannot be empty
-							</Text>
-						)}
-					</View>
-				)}
-				{isDocumentUploaded && (
-					<View style={styles.summaryCard}>
-						<View style={styles.summaryItem}>
-							<Text style={styles.summaryLabel}>Shop ID</Text>
-							<Text style={styles.summaryValue}>{shopId}</Text>
-						</View>
-						<View style={styles.summaryDivider} />
-						<View style={styles.summaryItem}>
-							<Text style={styles.summaryLabel}>Document Name</Text>
-							<Text style={styles.summaryValue}>{documentName || "Not provided"}</Text>
-						</View>
-						<View style={styles.summaryDivider} />
-						<View style={styles.summaryItem}>
-							<Text style={styles.summaryLabel}>File</Text>
-							<Text style={styles.summaryValue}>{document.name}</Text>
-						</View>
-					</View>
-				)}
-			</ScrollView>
-			<View style={styles.footer}>
-				<TouchableOpacity
-					style={[styles.continueButton, (!isDocumentUploaded || !documentName.trim()) && styles.continueButtonDisabled]}
-					onPress={handleContinue}
-					disabled={!isDocumentUploaded || !documentName.trim()}>
-					<Text style={styles.continueButtonText}>Continue</Text>
-					<Feather
-						name="arrow-right"
-						size={20}
-						color={colors.cardBackground}
-					/>
-				</TouchableOpacity>
+    return (
+        <SafeAreaView style={styles.container} edges={["top"]}>
+            <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
+            
+            <View style={styles.header}>
+                <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+                    <Feather name="arrow-left" size={24} color={colors.textPrimary} />
+                </TouchableOpacity>
+                <Text style={styles.headerTitle}>Upload Document</Text>
+                <View style={styles.placeholder} />
+            </View>
 
-				{isDocumentUploaded && documentName.trim() && (
-					<TouchableOpacity
-						style={styles.removeButton}
-						onPress={handleRemoveDocument}>
-						<Text style={styles.removeButtonText}>Remove Document</Text>
-					</TouchableOpacity>
-				)}
-			</View>
-		</SafeAreaView>
-	);
+            <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
+                <View style={styles.section}>
+                    <Text style={styles.sectionTitle}>Document Upload</Text>
+                    
+                    {/* Note: disabled={loading || isUploading} to prevent clicks while processing */}
+                    <TouchableOpacity
+                        style={[styles.uploadArea, isDocumentUploaded && styles.uploadAreaFilled, error && styles.uploadAreaError]}
+                        onPress={handleDocumentPick}
+                        disabled={loading || isUploading}> 
+                        {loading ? (
+                            <>
+                                <ActivityIndicator size="large" color={colors.primary} />
+                                <Text style={styles.uploadLoadingText}>Processing...</Text>
+                            </>
+                        ) : isDocumentUploaded ? (
+                            <>
+                                <View style={styles.uploadedIconContainer}>
+                                    <Feather name="check-circle" size={48} color={colors.primary} />
+                                </View>
+                                <Text style={styles.uploadedText}>Document Uploaded</Text>
+                                <Text style={styles.uploadedFileName}>{document.name}</Text>
+                                <Text style={styles.uploadedFileSize}>({(document.size / 1024).toFixed(2)} KB)</Text>
+                            </>
+                        ) : (
+                            <>
+                                <Feather name="upload-cloud" size={48} color={colors.primary} />
+                                <Text style={styles.uploadText}>Upload Your Document</Text>
+                                <Text style={styles.uploadSubtext}>Tap to select PDF, Word, Excel, or Image files</Text>
+                            </>
+                        )}
+                    </TouchableOpacity>
+
+                    {isDocumentUploaded && (
+                        <TouchableOpacity
+                            style={styles.changeButton}
+                            onPress={handleDocumentPick}
+                            disabled={isUploading}>
+                            <Feather name="refresh-cw" size={18} color={colors.textPrimary} />
+                            <Text style={styles.changeButtonText}>Change Document</Text>
+                        </TouchableOpacity>
+                    )}
+                    {error && (
+                        <View style={styles.errorBox}>
+                            <Feather name="alert-circle" size={18} color={colors.printRequest} />
+                            <Text style={styles.errorText}>{error}</Text>
+                        </View>
+                    )}
+                </View>
+
+                {isDocumentUploaded && (
+                    <View style={styles.section}>
+                        <Text style={styles.sectionTitle}>Document Name</Text>
+                        <Text style={styles.sectionDescription}>You can edit the document name, but it cannot be empty</Text>
+                        <View style={styles.nameInputContainer}>
+                            <TextInput
+                                style={styles.nameInput}
+                                placeholder="Enter document name"
+                                placeholderTextColor={colors.textSecondary}
+                                value={documentName}
+                                onChangeText={setDocumentName}
+                                editable={!isUploading} // Disable editing while uploading
+                            />
+                            {documentName.trim() && !isUploading && (
+                                <TouchableOpacity onPress={() => setDocumentName("")} style={styles.clearButton}>
+                                    <Feather name="x" size={20} color={colors.textSecondary} />
+                                </TouchableOpacity>
+                            )}
+                        </View>
+                        {!documentName.trim() && (
+                            <Text style={styles.warningText}>
+                                <Feather name="info" size={14} color={colors.printRequest} /> Document name cannot be empty
+                            </Text>
+                        )}
+                    </View>
+                )}
+
+                {isDocumentUploaded && (
+                    <View style={styles.summaryCard}>
+                        {/* Summary Items ... */}
+                        <View style={styles.summaryItem}>
+                            <Text style={styles.summaryLabel}>Shop ID</Text>
+                            <Text style={styles.summaryValue}>{shopId}</Text>
+                        </View>
+                        <View style={styles.summaryDivider} />
+                        <View style={styles.summaryItem}>
+                            <Text style={styles.summaryLabel}>Document Name</Text>
+                            <Text style={styles.summaryValue}>{documentName || "Not provided"}</Text>
+                        </View>
+                        <View style={styles.summaryDivider} />
+                        <View style={styles.summaryItem}>
+                            <Text style={styles.summaryLabel}>File</Text>
+                            <Text style={styles.summaryValue}>{document.name}</Text>
+                        </View>
+                    </View>
+                )}
+            </ScrollView>
+
+            <View style={styles.footer}>
+                <TouchableOpacity
+                    style={[
+                        styles.continueButton, 
+                        (!isDocumentUploaded || !documentName.trim() || isUploading) && styles.continueButtonDisabled
+                    ]}
+                    onPress={handleContinue}
+                    disabled={!isDocumentUploaded || !documentName.trim() || isUploading}>
+                    
+                    {/* Show Spinner inside button if Uploading/Checking */}
+                    {isUploading ? (
+                        <ActivityIndicator size="small" color={colors.cardBackground} />
+                    ) : (
+                        <>
+                            <Text style={styles.continueButtonText}>Continue</Text>
+                            <Feather name="arrow-right" size={20} color={colors.cardBackground} />
+                        </>
+                    )}
+                </TouchableOpacity>
+
+                {isDocumentUploaded && documentName.trim() && !isUploading && (
+                    <TouchableOpacity style={styles.removeButton} onPress={handleRemoveDocument}>
+                        <Text style={styles.removeButtonText}>Remove Document</Text>
+                    </TouchableOpacity>
+                )}
+            </View>
+        </SafeAreaView>
+    );
 };
 
-//----------------------------------- STYLES -----------------------------------//
-
+// ... Styles remain exactly the same ...
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
