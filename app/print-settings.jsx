@@ -1,5 +1,6 @@
 import { Feather } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import * as SecureStore from "expo-secure-store";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, Alert, KeyboardAvoidingView, Platform, ScrollView, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -20,6 +21,7 @@ const PrintSettings = () => {
 	const [pageRange, setPageRange] = useState("all");
 	const [numberOfCopies, setNumberOfCopies] = useState("1");
 	const [sidedness, setSidedness] = useState(null);
+	const [pageSize, setPageSize] = useState(null);
 	const [startPage, setStartPage] = useState("");
 	const [endPage, setEndPage] = useState("");
 
@@ -70,7 +72,9 @@ const PrintSettings = () => {
 	};
 
 	const handleSubmit = async () => {
-		if (!colorMode || !orientation || !sidedness || !pageRange || !numberOfCopies) {
+
+		const token = await SecureStore.getItemAsync("authToken");
+		if (!colorMode || !orientation || !sidedness || !pageRange || !numberOfCopies || !pageSize) {
 			Alert.alert("Incomplete Settings", "Please select all print settings.");
 			return;
 		}
@@ -98,6 +102,8 @@ const PrintSettings = () => {
 			form.append("shopId", shopId);
 			form.append("colorMode", colorMode);
 			form.append("orientation", orientation);
+			form.append("sidedness", sidedness);
+			form.append("pageSize", pageSize);
 			form.append("pageRange", pageRange);
 
 			if (pageRange === "custom") {
@@ -106,13 +112,15 @@ const PrintSettings = () => {
 			}
 
 			form.append("numberOfCopies", copies);
-			form.append("sidedness", sidedness);
+			
 
 			console.log("Submitting print job");
 
 			const response = await fetch(`${API_BASE_URL}/newJob`, {
 				method: "POST",
-				headers: {},
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
 				body: form,
 			});
 
@@ -123,8 +131,6 @@ const PrintSettings = () => {
 				console.log(jsonError);
 				throw new Error(`Server returned invalid response: ${response.status}`);
 			}
-
-			// Bug fix: Check response status
 			if (!response.ok) {
 				throw new Error(data.message || `Server error: ${response.status}`);
 			}
@@ -245,6 +251,17 @@ const PrintSettings = () => {
 							onSelect={setSidedness}
 						/>
 
+						{/* Page Size */}
+						<SettingRow
+							label="Page Size"
+							options={[
+								{ label: "A4", value: "a4" },
+								{ label: "Letter", value: "letter" },
+							]}
+							selectedValue={pageSize}
+							onSelect={setPageSize}
+						/>
+
 						{/* Page Range */}
 						<View style={styles.settingRow}>
 							<Text style={styles.settingLabel}>Page Range</Text>
@@ -341,7 +358,8 @@ const PrintSettings = () => {
 				<View style={styles.footer}>
 					<TouchableOpacity
 						style={[styles.submitButton, loading && styles.submitButtonDisabled]}
-						onPress={handleSubmit}>
+						onPress={handleSubmit}
+						disabled={loading}>
 						{loading ? (
 							<ActivityIndicator
 								size="small"

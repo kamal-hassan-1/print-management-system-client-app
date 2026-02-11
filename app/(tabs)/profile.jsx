@@ -15,26 +15,8 @@ const API_BASE_URL = config.apiBaseUrl;
 // ----------------------------------- COMPONENTS -----------------------------------//
 
 const fetchUserName = async () => {
-	const authToken = await SecureStore.getItemAsync("authToken");
-	try {
-		const response = await fetch(`${API_BASE_URL}/profile`, {
-			method: "GET",
-			headers: {
-				Authorization: `Bearer ${authToken}`,
-			},
-		});
-		const body = await response.json();
-		console.log(body);
-		if (response.status === 200) {
-			const name = body?.data?.profile?.name ?? "John Doe";
-			return name;
-		} else {
-			return "John Doe";
-		}
-	} catch (error) {
-		console.error("Error fetching user name from secure storage:", error);
-		return "John Doe";
-	}
+	const name = await SecureStore.getItemAsync("name") ?? "John Doe";
+	return name;
 };
 
 const Profile = () => {

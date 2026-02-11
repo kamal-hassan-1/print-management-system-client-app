@@ -31,6 +31,7 @@ const HomePage = () => {
 		// 		</TouchableOpacity>
 		// 	</View>
 		// );
+		
 		Alert.alert("Error loading transactions");
 	}
 	return (

@@ -3,6 +3,7 @@
 
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import * as SecureStore from "expo-secure-store";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, Alert, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -30,15 +31,20 @@ const NewPrint = () => {
 		try {
 			setLoading(true);
 			setError(null);
-
-			const response = await fetch(`${API_BASE_URL}/getShops`);
+			const token = await SecureStore.getItemAsync("authToken");
+			console.log(token);
+			const response = await fetch(`${API_BASE_URL}/shops`, {
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			});
 
 			if (!response.ok) {
 				throw new Error(`HTTP error! status: ${response.status}`);
 			}
 
 			const data = await response.json();
-			setShops(data.shops);
+			setShops(data.data.shops);
 		} catch (err) {
 			console.error("Error fetching shops:", err);
 			setError(err.message || "Failed to load shops. Please try again.");

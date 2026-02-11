@@ -70,6 +70,7 @@ const VerifyCode = () => {
 			});
 			const body = await response.json();
 			if (body.success) {
+				console.log(body);
 				await SecureStore.setItemAsync("authToken", body.data.token);
 				console.log("OTP verified successfully for", phoneNumber);
 				router.replace("/profile-setup");

@@ -52,7 +52,7 @@ const ProfileSetup = () => {
 
 	const handleSubmit = async () => {
 		const token = await SecureStore.getItemAsync("authToken");
-		
+
 		if (!userName.trim()) {
 			setError("Please enter your name");
 			return;
@@ -89,6 +89,7 @@ const ProfileSetup = () => {
 				}),
 			});
 			const data = await response.json();
+			await SecureStore.setItemAsync("name", data.data.profile.name);
 			console.log(data);
 			if (response.ok) {
 				setSuccess(true);
