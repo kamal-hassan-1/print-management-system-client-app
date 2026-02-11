@@ -94,7 +94,7 @@ const VerifyCode = () => {
 					"Content-Type": "application/json",
 				},
 				body: JSON.stringify({ number: phoneNumber }),
-			});
+			});  
 			const data = await response.json();
 			if (data.success) {
 				setCodes(["", "", "", "", ""]);
@@ -227,7 +227,7 @@ const VerifyCode = () => {
 };
 
 //----------------------------------- STYLES -----------------------------------//
-
+ 
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
