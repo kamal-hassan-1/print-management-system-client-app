@@ -1,26 +1,59 @@
+//----------------------------------- IMPORTS -----------------------------------//
+
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import * as SecureStore from "expo-secure-store";
+import { useEffect, useState } from "react";
 import { Alert, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import config from "../../config/config";
 import { colors } from "../../constants/colors";
 
+//----------------------------------- CONSTANTS -----------------------------------//
+
+const API_BASE_URL = config.apiBaseUrl;
+// ----------------------------------- COMPONENTS -----------------------------------//
+
+const fetchUserName = async () => {
+	const name = await SecureStore.getItemAsync("name") ?? "John Doe";
+	return name;
+};
+
 const Profile = () => {
+	const [userName, setUserName] = useState("Loading...");
+
+	useEffect(() => {
+		const loadName = async () => {
+			const name = await fetchUserName();
+			setUserName(name);
+		};
+		loadName();
+	}, []);
+
 	const router = useRouter();
 	const handleLogout = () => {
 		Alert.alert("Logout", "Are you sure you want to logout?", [
 			{
 				text: "Cancel",
-				style: "cancel"
+				style: "cancel",
 			},
 			{
 				text: "Logout",
-				onPress: () => {
-					console.log("Logout pressed");
-					router.replace("/");
-				}
-			}
+				onPress: async () => {
+					try {
+						console.log("Logout pressed");
+						await SecureStore.deleteItemAsync("authToken");
+						router.replace("/");
+					} catch (error) {
+						console.error("Error during logout, maybe issue with deleting token:", error);
+						Alert.alert("Error", "An error occurred while logging out. Please try again.");
+					}
+				},
+			},
 		]);
 	};
+
+//----------------------------------- STYLES -----------------------------------//
 
 	return (
 		<SafeAreaView
@@ -44,8 +77,7 @@ const Profile = () => {
 							color={colors.cardBackground}
 						/>
 					</View>
-					<Text style={styles.userName}>User Name</Text>
-					<Text style={styles.userEmail}>user@example.com</Text>
+					<Text style={styles.userName}>{userName}</Text>
 				</View>
 
 				{/* Profile Sections */}
@@ -76,7 +108,8 @@ const Profile = () => {
 				<View style={styles.section}>
 					<Text style={styles.sectionTitle}>Preferences</Text>
 
-					<TouchableOpacity style={styles.menuItem}
+					<TouchableOpacity
+						style={styles.menuItem}
 						onPress={() => {
 							Alert.alert("Funtionality to be added soon!");
 						}}>
@@ -95,7 +128,8 @@ const Profile = () => {
 						/>
 					</TouchableOpacity>
 
-					<TouchableOpacity style={styles.menuItem}
+					<TouchableOpacity
+						style={styles.menuItem}
 						onPress={() => {
 							Alert.alert("Funtionality to be added soon!");
 						}}>
@@ -118,7 +152,8 @@ const Profile = () => {
 				<View style={styles.section}>
 					<Text style={styles.sectionTitle}>Help</Text>
 
-					<TouchableOpacity style={styles.menuItem}
+					<TouchableOpacity
+						style={styles.menuItem}
 						onPress={() => {
 							Alert.alert("Funtionality to be added soon!");
 						}}>
@@ -137,7 +172,8 @@ const Profile = () => {
 						/>
 					</TouchableOpacity>
 
-					<TouchableOpacity style={styles.menuItem}
+					<TouchableOpacity
+						style={styles.menuItem}
 						onPress={() => {
 							Alert.alert("Funtionality to be added soon!");
 						}}>
@@ -173,6 +209,8 @@ const Profile = () => {
 	);
 };
 
+//----------------------------------- STYLES -----------------------------------//
+
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
@@ -206,10 +244,6 @@ const styles = StyleSheet.create({
 		fontWeight: "700",
 		color: colors.textPrimary,
 		marginBottom: 4,
-	},
-	userEmail: {
-		fontSize: 14,
-		color: colors.textSecondary,
 	},
 	section: {
 		marginBottom: 24,

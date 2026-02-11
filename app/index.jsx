@@ -13,7 +13,7 @@ import { colors } from "../constants/colors";
 
 const API_BASE_URL = config.apiBaseUrl;
 
-//----------------------------------- COMPONENT -----------------------------------//
+//----------------------------------- COMPONENTS -----------------------------------//
 
 const Login = () => {
 	const router = useRouter();
@@ -165,7 +165,7 @@ const Login = () => {
 	);
 };
 
-//----------------------------------- Styles -----------------------------------//
+//----------------------------------- STYLES -----------------------------------//
 
 const styles = StyleSheet.create({
 	container: {

@@ -1,14 +1,19 @@
-
 //----------------------------------- IMPORTS -----------------------------------//
 
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import * as SecureStore from "expo-secure-store";
 import { useEffect, useRef, useState } from "react";
 import { Animated, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import config from "../config/config";
 import { colors } from "../constants/colors";
 
-//----------------------------------- COMPONENT -----------------------------------//
+//----------------------------------- CONSTANTS -----------------------------------//
+
+const API_BASE_URL = config.apiBaseUrl;
+
+//----------------------------------- COMPONENTS -----------------------------------//
 
 const ProfileSetup = () => {
 	const router = useRouter();
@@ -46,6 +51,8 @@ const ProfileSetup = () => {
 	}, [opacityAnim, scaleAnim, slideAnim]);
 
 	const handleSubmit = async () => {
+		const token = await SecureStore.getItemAsync("authToken");
+
 		if (!userName.trim()) {
 			setError("Please enter your name");
 			return;
@@ -71,18 +78,19 @@ const ProfileSetup = () => {
 		]).start();
 
 		try {
-			const response = await fetch(`${config.apiBaseUrl}/user`, {
+			const response = await fetch(`${API_BASE_URL}/profile`, {
 				method: "PATCH",
 				headers: {
 					"Content-Type": "application/json",
+					Authorization: `Bearer ${token}`,
 				},
 				body: JSON.stringify({
 					name: userName.trim(),
 				}),
 			});
-
 			const data = await response.json();
-
+			await SecureStore.setItemAsync("name", data.data.profile.name);
+			console.log(data);
 			if (response.ok) {
 				setSuccess(true);
 
@@ -118,7 +126,7 @@ const ProfileSetup = () => {
 		outputRange: [1, 0.95],
 	});
 
-//----------------------------------- RENDER -----------------------------------//
+	//----------------------------------- RENDER -----------------------------------//
 
 	return (
 		<SafeAreaView style={styles.container}>

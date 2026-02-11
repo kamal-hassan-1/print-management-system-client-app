@@ -14,7 +14,7 @@ import { colors } from "../constants/colors";
 
 const API_BASE_URL = config.apiBaseUrl;
 
-//----------------------------------- COMPONENT -----------------------------------//
+//----------------------------------- COMPONENTS -----------------------------------//
 
 const VerifyCode = () => {
 	const router = useRouter();
@@ -69,10 +69,11 @@ const VerifyCode = () => {
 				body: JSON.stringify({ code, number: phoneNumber }),
 			});
 			const body = await response.json();
-			console.log(body);
 			if (body.success) {
+				console.log(body);
 				await SecureStore.setItemAsync("authToken", body.data.token);
-				router.replace({ pathname: "/profile-setup" });
+				console.log("OTP verified successfully for", phoneNumber);
+				router.replace("/profile-setup");
 			} else {
 				setShowErrorModal(true);
 			}

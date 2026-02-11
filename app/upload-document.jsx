@@ -1,3 +1,6 @@
+
+//----------------------------------- IMPORTS -----------------------------------//
+
 import { Feather } from "@expo/vector-icons";
 import * as DocumentPicker from "expo-document-picker";
 import { useLocalSearchParams, useRouter } from "expo-router";
@@ -5,6 +8,8 @@ import { useEffect, useState } from "react";
 import { ActivityIndicator, Alert, ScrollView, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { colors } from "../constants/colors";
+
+//----------------------------------- COMPONENTS -----------------------------------//
 
 const UploadDocument = () => {
 	const router = useRouter();
@@ -77,6 +82,8 @@ const UploadDocument = () => {
 		});
 	};
 	const isDocumentUploaded = !!document;
+
+//----------------------------------- RENDER -----------------------------------//
 
 	return (
 		<SafeAreaView
@@ -244,6 +251,9 @@ const UploadDocument = () => {
 		</SafeAreaView>
 	);
 };
+
+//----------------------------------- STYLES -----------------------------------//
+
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
