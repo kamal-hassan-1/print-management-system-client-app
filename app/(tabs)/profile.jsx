@@ -43,6 +43,7 @@ const Profile = () => {
 					try {
 						console.log("Logout pressed");
 						await SecureStore.deleteItemAsync("authToken");
+						await SecureStore.deleteItemAsync("name");
 						router.replace("/");
 					} catch (error) {
 						console.error("Error during logout, maybe issue with deleting token:", error);

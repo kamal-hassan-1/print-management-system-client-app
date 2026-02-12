@@ -3,44 +3,64 @@
 
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import * as SecureStore from "expo-secure-store";
+import { useEffect, useState } from "react";
 import { ActivityIndicator, Alert, Dimensions, RefreshControl, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import TransactionList from "../../components/TransactionList";
+import config from "../../config/config";
 import { colors } from "../../constants/colors";
 import { useTransactions } from "../../hooks/useTransactions";
-
 
 //----------------------------------- CONSTANTS -----------------------------------//
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
+const API_BASE_URL = config.apiBaseUrl;
 
 //----------------------------------- COMPONENTS -----------------------------------//
 
 const HomePage = () => {
 	const router = useRouter();
 	const { transactions, loading, error, refresh, refreshing } = useTransactions();
-	if (loading) {
-		return (
-			<View style={styles.centerContainer}>
-				<ActivityIndicator
-					size="large"
-					color={colors.primary}
-				/>
-			</View>
-		);
+	const [accountBalance, setAccountBalance] = useState(0);
+
+	useEffect(() => {
+		fetchBalance();
+	}, []);
+
+	const fetchBalance = async () => {
+			try {
+				const token = await SecureStore.getItemAsync("authToken");
+				const response = await fetch(`${API_BASE_URL}/profile`, {
+					headers: {
+						Authorization: `Bearer ${token}`,
+					},
+				});
+				const body = await response.json();
+				if (body.success) {
+					console.log("Balance:",body.data.profile.balance);
+					setAccountBalance(body.data.profile.balance);
+				}
+			} catch (error) {
+				console.error("Error fetching account balance:", error);
+			}
+		};
+
+	const refreshAll = () => {
+		refresh();
+		fetchBalance();
 	}
 
 	if (error) {
-		// return (
-		// 	<View style={styles.centerContainer}>
-		// 		<Text style={styles.errorText}>Error loading transactions</Text>
-		// 		<TouchableOpacity onPress={refresh} style={styles.retryButton}>
-		// 			<Text style={styles.retryText}>Retry</Text>
-		// 		</TouchableOpacity>
-		// 	</View>
-		// );
+		return (
+			<View style={styles.centerContainer}>
+				<Text style={styles.errorText}>Error loading transactions</Text>
+				<TouchableOpacity onPress={refresh} style={styles.retryButton}>
+					<Text style={styles.retryText}>Retry</Text>
+				</TouchableOpacity>
+			</View>
+		);
 		
-		Alert.alert("Error loading transactions");
 	}
 	return (
 		<SafeAreaView
@@ -57,7 +77,7 @@ const HomePage = () => {
 				refreshControl={
 					<RefreshControl
 						refreshing={refreshing}
-						onRefresh={refresh}
+						onRefresh={refreshAll}
 					/>
 				}>
 
@@ -68,7 +88,7 @@ const HomePage = () => {
 						<TouchableOpacity style={styles.balanceCard}>
 							<View style={styles.balanceContent}>
 								<Text style={styles.balanceLabel}>Current Balance</Text>
-								<Text style={styles.balanceAmount}>Rs. 0</Text>
+								<Text style={styles.balanceAmount}>{accountBalance}</Text>
 							</View>
 						</TouchableOpacity>
 
@@ -121,11 +141,19 @@ const HomePage = () => {
 							<Text style={styles.seeAllText}>See All</Text>
 						</TouchableOpacity>
 					</View>
-
-					<TransactionList
-						transactions={transactions}
-						limit={3}
-					/>
+                    {loading ? (
+                        <View style={styles.loadingContainer}>
+                            <ActivityIndicator 
+                                size="large" 
+                                color={colors.primary} 
+                            />
+                        </View>
+                    ) : (
+                        <TransactionList
+                            transactions={transactions}
+                            limit={3}
+                        />
+                    )}
 				</View>
 			</ScrollView>
 		</SafeAreaView>

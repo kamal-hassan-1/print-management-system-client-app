@@ -9,7 +9,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { colors } from "../constants/colors";
 
 // Import your service here (Adjust path if needed)
-import { calculateFileHash, checkFileExists, uploadFile } from '../services/fileService'; 
+import { uploadFile } from '../services/fileService'; 
 
 //----------------------------------- COMPONENTS -----------------------------------//
 

@@ -3,8 +3,10 @@
 
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { useState } from "react";
-import { ActivityIndicator, Alert, Keyboard, KeyboardAvoidingView, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
+import * as SecureStore from "expo-secure-store";
+import * as SplashScreen from "expo-splash-screen";
+import { useCallback, useEffect, useState } from "react";
+import { ActivityIndicator, Alert, Keyboard, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import config from "../config/config";
 import { colors } from "../constants/colors";
@@ -12,6 +14,7 @@ import { colors } from "../constants/colors";
 //----------------------------------- CONSTANTS -----------------------------------//
 
 const API_BASE_URL = config.apiBaseUrl;
+SplashScreen.preventAutoHideAsync();
 
 //----------------------------------- COMPONENTS -----------------------------------//
 
@@ -21,6 +24,37 @@ const Login = () => {
 	const [phone, setPhone] = useState("");
 	const [showPicker, setShowPicker] = useState(false);
 	const [loading, setLoading] = useState(false);
+	const [isReady, setReady] = useState(false);
+
+	useEffect(() => {
+		(async () => {
+			try{
+				const token = await SecureStore.getItemAsync("authToken");
+				if (token) {
+					console.log("Token found:", token);
+					await SplashScreen.hideAsync();
+					router.replace("(tabs)/home");
+				}
+				else{
+					setReady(true);
+				}
+			}
+			catch(error){
+				console.log("Error fetching token:", error);
+				setReady(true);
+			}
+		})();
+	}, []);
+
+	const onLayoutRootView = useCallback(async () => {
+		if (isReady) {
+			await SplashScreen.hideAsync();
+		}
+	}, [isReady]);
+	
+	if(!isReady){
+		return null;
+	}
 
 	const countryCodes = [{ label: "🇵🇰 Pakistan +92", value: "+92" }];
 
@@ -53,7 +87,11 @@ const Login = () => {
 			}
 		} catch (error) {
 			console.error("Error sending OTP:", error);
-			Alert.alert("Error", "An unexpected error occurred. Please try again.");
+			if (error.message === "Network request failed") {
+				Alert.alert("No Internet", "Please check your internet connection and try again.");
+			} else {
+				Alert.alert("Error", "An unexpected error occurred. Please try again.");
+			}
 		} finally {
 			setLoading(false);
 		}
@@ -81,14 +119,14 @@ const Login = () => {
 	return (
 		<KeyboardAvoidingView
 			style={{ flex: 1 }}
-			behavior="height">
+			behavior={Platform.OS === "ios" ? "padding" : "height"}>
 			<TouchableWithoutFeedback
 				onPress={() => {
 					Keyboard.dismiss();
 					setShowPicker(false);
 				}}
 				accessible={false}>
-				<SafeAreaView style={styles.container}>
+				<SafeAreaView style={styles.container} onLayout={onLayoutRootView}>
 					<Text style={styles.heading}>Let&apos;s get started!</Text>
 					<Text style={styles.subHeading}>Please enter your mobile number</Text>
 

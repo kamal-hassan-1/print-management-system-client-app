@@ -75,6 +75,7 @@ const VerifyCode = () => {
 				console.log("OTP verified successfully for", phoneNumber);
 				
 				if (body.data.profile && body.data.profile.name) {
+					await SecureStore.setItemAsync("name", body.data.profile.name);
 					router.replace("/(tabs)/home");
 				} else {
 					router.replace("/profile-setup");
