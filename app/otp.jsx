@@ -73,7 +73,12 @@ const VerifyCode = () => {
 				console.log(body);
 				await SecureStore.setItemAsync("authToken", body.data.token);
 				console.log("OTP verified successfully for", phoneNumber);
-				router.replace("/profile-setup");
+				
+				if (body.data.profile && body.data.profile.name) {
+					router.replace("/(tabs)/home");
+				} else {
+					router.replace("/profile-setup");
+				}
 			} else {
 				setShowErrorModal(true);
 			}
@@ -95,7 +100,7 @@ const VerifyCode = () => {
 					"Content-Type": "application/json",
 				},
 				body: JSON.stringify({ number: phoneNumber }),
-			});  
+			});
 			const data = await response.json();
 			if (data.success) {
 				setCodes(["", "", "", "", ""]);
@@ -125,7 +130,7 @@ const VerifyCode = () => {
 		return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
 	};
 
-//----------------------------------- RENDER -----------------------------------//
+	//----------------------------------- RENDER -----------------------------------//
 
 	return (
 		<SafeAreaView style={styles.container}>
@@ -228,7 +233,7 @@ const VerifyCode = () => {
 };
 
 //----------------------------------- STYLES -----------------------------------//
- 
+
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
