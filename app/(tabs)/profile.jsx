@@ -4,8 +4,9 @@ import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { useEffect, useState } from "react";
-import { Alert, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Alert, Image, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import avatar from "../../assets/images/9090692.jpg";
 import config from "../../config/config";
 import { colors } from "../../constants/colors";
 
@@ -71,13 +72,7 @@ const Profile = () => {
 				showsVerticalScrollIndicator={false}>
 				{/* Profile Header */}
 				<View style={styles.profileHeader}>
-					<View style={styles.avatarContainer}>
-						<Feather
-							name="user"
-							size={60}
-							color={colors.cardBackground}
-						/>
-					</View>
+					<Image source={avatar} style={styles.avatarContainer}/>
 					<Text style={styles.userName}>{userName}</Text>
 				</View>
 
