@@ -1,12 +1,12 @@
 import "dotenv/config";
 export default {
   "expo": {
-    "name": "print-management-system-client-app",
-    "slug": "print-management-system-client-app",
+    "name": "ClickPrint",
+    "slug": "ClickPrint",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "printmanagementsystemclientapp",
+    "scheme": "ClickPrint",
     "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/images/icon.png",

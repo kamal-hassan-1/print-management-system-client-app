@@ -1,271 +1,337 @@
+
 //----------------------------------- IMPORTS -----------------------------------//
 
 import { Feather } from "@expo/vector-icons";
 import * as DocumentPicker from "expo-document-picker";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import * as SecureStore from "expo-secure-store";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, Alert, ScrollView, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import config from "../config/config";
 import { colors } from "../constants/colors";
 
-// Import your service here (Adjust path if needed)
-import { uploadFile } from '../services/fileService'; 
+//----------------------------------- CONSTANTS ------------------------------------//
+
+const API_BASE_URL = config.apiBaseUrl;
 
 //----------------------------------- COMPONENTS -----------------------------------//
 
+const DocumentCard = ({ doc, index, onRemove, onUpdateName }) => {
+	const extension = doc.file.name ? doc.file.name.split(".").pop().toUpperCase() : "FILE";
+
+	return (
+		<View style={styles.documentCard}>
+			<View style={styles.documentCardHeader}>
+				<View style={styles.documentIconContainer}>
+					<Feather name="file-text" size={22} color={colors.primary} />
+					<Text style={styles.extensionBadge}>{extension}</Text>
+				</View>
+				<View style={styles.documentInfo}>
+					<Text style={styles.documentOriginalName} numberOfLines={1}>{doc.file.name}</Text>
+					<Text style={styles.documentFileSize}>{(doc.file.size / 1024).toFixed(2)} KB</Text>
+				</View>
+				<TouchableOpacity
+					style={styles.removeCardButton}
+					onPress={() => onRemove(index)}>
+					<Feather name="x" size={18} color={colors.printRequest} />
+				</TouchableOpacity>
+			</View>
+			<View style={styles.documentNameInput}>
+				<Text style={styles.documentNameLabel}>Display Name</Text>
+				<View style={styles.nameInputRow}>
+					<TextInput
+						style={styles.cardNameInput}
+						placeholder="Enter document name"
+						placeholderTextColor={colors.textSecondary}
+						value={doc.name}
+						onChangeText={(text) => onUpdateName(index, text)}
+					/>
+					{doc.name.trim() && (
+						<TouchableOpacity
+							onPress={() => onUpdateName(index, "")}
+							style={styles.clearButton}>
+							<Feather name="x" size={16} color={colors.textSecondary} />
+						</TouchableOpacity>
+					)}
+				</View>
+				{!doc.name.trim() && (
+					<Text style={styles.cardWarningText}>
+						<Feather name="info" size={12} color={colors.printRequest} />{" "}
+						Name cannot be empty
+					</Text>
+				)}
+			</View>
+		</View>
+	);
+};
+
 const UploadDocument = () => {
-    const router = useRouter();
-    const params = useLocalSearchParams();
-    
-    const [document, setDocument] = useState(null);
-    const [documentName, setDocumentName] = useState("");
-    
-    // 'loading' is for picking the file from phone
-    const [loading, setLoading] = useState(false);
-    // 'isUploading' is for checking/sending file to server
-    const [isUploading, setIsUploading] = useState(false);
-    
-    const [error, setError] = useState(null);
+	const router = useRouter();
+	const params = useLocalSearchParams();
+	const [documents, setDocuments] = useState([]);
+	const [loading, setLoading] = useState(false);
+	const [error, setError] = useState(null);
 
-    const shopId = params.shopId;
-    useEffect(() => {
-        if (!shopId) {
-            Alert.alert("Error", "Shop ID not found. Please go back and select a shop.");
-            router.back();
-        }
-    }, [router, shopId]);
+	const shopId = params.shopId;
+	useEffect(() => {
+		if (!shopId) {
+			Alert.alert("Error", "Shop ID not found. Please go back and select a shop.");
+			router.back();
+		}
+	}, [router, shopId]);
 
-    const handleDocumentPick = async () => {
-        try {
-            setError(null);
-            setLoading(true);
+	const handleDocumentPick = async () => {
+		try {
+			setError(null);
+			setLoading(true);
 
-            const result = await DocumentPicker.getDocumentAsync({
+			const result = await DocumentPicker.getDocumentAsync({
+				type: ["application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "text/plain", "image/jpeg", "image/png", "image/jpg"],
+				copyToCacheDirectory: true,
 				multiple: true,
-                type: ["application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "text/plain", "image/jpeg", "image/png", "image/jpg"],
-                copyToCacheDirectory: true,
-            });
+			});
 
-            if (!result.canceled) {
-                const file = result.assets[0];
-                const fileName = file.name ? file.name.replace(/\.[^/.]+$/, "") : "Document";
+			if (!result.canceled) {
+				const newDocs = result.assets.map((file) => ({
+					file,
+					name: file.name ? file.name.replace(/\.[^/.]+$/, "") : "Document",
+				}));
+				setDocuments((prev) => [...prev, ...newDocs]);
+				setError(null);
+			}
+		} catch (err) {
+			console.error("Error picking document:", err);
+			setError("Failed to pick document. Please try again.");
+		} finally {
+			setLoading(false);
+		}
+	};
 
-                setDocument(file);
-                setDocumentName(fileName);
-                setError(null);
-            }
-        } catch (err) {
-            console.error("Error picking document:", err);
-            setError("Failed to pick document. Please try again.");
-        } finally {
-            setLoading(false);
-        }
-    };
+	const handleRemoveDocument = (index) => {
+		setDocuments((prev) => prev.filter((_, i) => i !== index));
+	};
 
-    const handleRemoveDocument = () => {
-        setDocument(null);
-        setDocumentName("");
-        setError(null);
-    };
+	const handleUpdateName = (index, newName) => {
+		setDocuments((prev) =>
+			prev.map((doc, i) => (i === index ? { ...doc, name: newName } : doc))
+		);
+	};
 
-    // --- INTEGRATION LOGIC STARTS HERE ---
-    const handleContinue = async () => {
-        if (!document) {
-            Alert.alert("No Document", "Please upload a document to continue.");
-            return;
-        }
-        if (!documentName.trim()) {
-            Alert.alert("Invalid Name", "Please provide a document name.");
-            return;
-        }
+	const handleRemoveAll = () => {
+		Alert.alert("Remove All", "Are you sure you want to remove all documents?", [
+			{ text: "Cancel", style: "cancel" },
+			{ text: "Remove All", style: "destructive", onPress: () => setDocuments([]) },
+		]);
+	};
 
-        setIsUploading(true);
-        setError(null);
+	const handleContinue = () => {
+		if (documents.length === 0) {
+			Alert.alert("No Documents", "Please upload at least one document to continue.");
+			return;
+		}
+		const emptyNameIndex = documents.findIndex((d) => !d.name.trim());
+		if (emptyNameIndex !== -1) {
+			Alert.alert("Invalid Name", `Please provide a name for document #${emptyNameIndex + 1}.`);
+			return;
+		}
+		const allDocumentsAreUploaded = [];
+		const fileHashes = [];
+		const UploadDocuments = async () => {
+			documents.map( async (d) => {
+				const formData = new FormData();
+				formData.append("file", {
+					uri: d.file.uri,
+					name: d.file.name,
+					type: d.file.mimeType,
+				})
+				try{
+					const token = await SecureStore.getItemAsync("authToken");
+					const response = await fetch(`${API_BASE_URL}/files`, {
+						method: "POST",
+						headers: {
+							"Authorization": `Bearer ${token}`,
+						},
+						body: formData,
+					})
+					const body = await response.json();
+					
+					if(response.status === 202){
+						allDocumentsAreUploaded.push(true);
+						fileHashes.push(body.data.hash);
+					}else if(response.status === 200){
+						allDocumentsAreUploaded.push(false);
+					}else{
+						//code to be written
+					}
+				}
+				catch(err){
+					console.error("Error uploading document:", err);
+					setError("Failed to upload document. Please try again.");
+				}
+			});
+		}
+		UploadDocuments();
+		let proceed = true;
+		for(let i = 0; i < allDocumentsAreUploaded.length; i++){
+			if(allDocumentsAreUploaded[i] === false){
+				proceed = false;
+				break;
+			}
+		}
+		if(proceed){
+			router.push({
+				pathname: "/print-settings",
+				params: {
+					shopId: shopId,
+					fileHashes: fileHashes,
+				}
+			})
+		}
+	};
 
-        try {
-            // 1. Calculate Hash (Client Side)
-            console.log("Generating hash...");
-            const hash = await calculateFileHash(document.uri);
-            
-            // 2. Check if file exists on Server (Endpoint 1)
-            console.log(`Checking hash: ${hash}`);
-            const exists = await checkFileExists(hash);
-
-            // 3. Upload only if it doesn't exist (Endpoint 2)
-            if (!exists) {
-                console.log("File not found on server. Uploading...");
-                await uploadFile(document);
-            } else {
-                console.log("File already exists. Skipping upload.");
-            }
-
-            // 4. Navigate to Settings (Passing the hash!)
-            router.push({
-                pathname: "/print-settings",
-                params: {
-                    shopId: shopId,
-                    documentName: documentName.trim(),
-                    documentUri: document.uri,
-                    documentSize: document.size,
-                    documentMimeType: document.mimeType,
-                    fileHash: hash, // <--- We pass the hash to the next screen for the final Job API
-                },
-            });
-
-        } catch (err) {
-            console.error("Upload sequence failed:", err);
-            Alert.alert("Upload Failed", "Could not verify or upload your document. Please check your internet connection.");
-            // We do NOT navigate if there is an error
-        } finally {
-            setIsUploading(false);
-        }
-    };
-    // --- INTEGRATION LOGIC ENDS HERE ---
-
-    const isDocumentUploaded = !!document;
+	const hasDocuments = documents.length > 0;
+	const allNamesValid = documents.every((d) => d.name.trim());
+	const totalSize = documents.reduce((sum, d) => sum + (d.file.size || 0), 0);
 
 //----------------------------------- RENDER -----------------------------------//
 
-    return (
-        <SafeAreaView style={styles.container} edges={["top"]}>
-            <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
-            
-            <View style={styles.header}>
-                <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-                    <Feather name="arrow-left" size={24} color={colors.textPrimary} />
-                </TouchableOpacity>
-                <Text style={styles.headerTitle}>Upload Document</Text>
-                <View style={styles.placeholder} />
-            </View>
+	return (
+		<SafeAreaView
+			style={styles.container}
+			edges={["top"]}>
+			<StatusBar
+				barStyle="dark-content"
+				backgroundColor={colors.background}
+			/>
+			<View style={styles.header}>
+				<TouchableOpacity
+					onPress={() => router.back()}
+					style={styles.backButton}>
+					<Feather
+						name="arrow-left"
+						size={24}
+						color={colors.textPrimary}
+					/>
+				</TouchableOpacity>
+				<Text style={styles.headerTitle}>Upload Documents</Text>
+				<View style={styles.placeholder} />
+			</View>
+			<ScrollView
+				style={styles.scrollView}
+				contentContainerStyle={styles.scrollContent}>
+				<View style={styles.section}>
+					<Text style={styles.sectionTitle}>
+						Documents {hasDocuments ? `(${documents.length})` : ""}
+					</Text>
 
-            <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
-                <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>Document Upload</Text>
-                    
-                    {/* Note: disabled={loading || isUploading} to prevent clicks while processing */}
-                    <TouchableOpacity
-                        style={[styles.uploadArea, isDocumentUploaded && styles.uploadAreaFilled, error && styles.uploadAreaError]}
-                        onPress={handleDocumentPick}
-                        disabled={loading || isUploading}> 
-                        {loading ? (
-                            <>
-                                <ActivityIndicator size="large" color={colors.primary} />
-                                <Text style={styles.uploadLoadingText}>Processing...</Text>
-                            </>
-                        ) : isDocumentUploaded ? (
-                            <>
-                                <View style={styles.uploadedIconContainer}>
-                                    <Feather name="check-circle" size={48} color={colors.primary} />
-                                </View>
-                                <Text style={styles.uploadedText}>Document Uploaded</Text>
-                                <Text style={styles.uploadedFileName}>{document.name}</Text>
-                                <Text style={styles.uploadedFileSize}>({(document.size / 1024).toFixed(2)} KB)</Text>
-                            </>
-                        ) : (
-                            <>
-                                <Feather name="upload-cloud" size={48} color={colors.primary} />
-                                <Text style={styles.uploadText}>Upload Your Document</Text>
-                                <Text style={styles.uploadSubtext}>Tap to select PDF, Word, Excel, or Image files</Text>
-                            </>
-                        )}
-                    </TouchableOpacity>
+					{/* Empty state - upload area */}
+					{!hasDocuments && !loading && (
+						<TouchableOpacity
+							style={styles.uploadArea}
+							onPress={handleDocumentPick}>
+							<Feather
+								name="upload-cloud"
+								size={48}
+								color={colors.primary}
+							/>
+							<Text style={styles.uploadText}>Upload Your Documents</Text>
+							<Text style={styles.uploadSubtext}>Tap to select PDF, Word, Excel, or Image files</Text>
+						</TouchableOpacity>
+					)}
 
-                    {isDocumentUploaded && (
-                        <TouchableOpacity
-                            style={styles.changeButton}
-                            onPress={handleDocumentPick}
-                            disabled={isUploading}>
-                            <Feather name="refresh-cw" size={18} color={colors.textPrimary} />
-                            <Text style={styles.changeButtonText}>Change Document</Text>
-                        </TouchableOpacity>
-                    )}
-                    {error && (
-                        <View style={styles.errorBox}>
-                            <Feather name="alert-circle" size={18} color={colors.printRequest} />
-                            <Text style={styles.errorText}>{error}</Text>
-                        </View>
-                    )}
-                </View>
+					{/* Loading state */}
+					{loading && (
+						<View style={[styles.uploadArea, styles.uploadAreaFilled]}>
+							<ActivityIndicator size="large" color={colors.primary} />
+							<Text style={styles.uploadLoadingText}>Processing...</Text>
+						</View>
+					)}
 
-                {isDocumentUploaded && (
-                    <View style={styles.section}>
-                        <Text style={styles.sectionTitle}>Document Name</Text>
-                        <Text style={styles.sectionDescription}>You can edit the document name, but it cannot be empty</Text>
-                        <View style={styles.nameInputContainer}>
-                            <TextInput
-                                style={styles.nameInput}
-                                placeholder="Enter document name"
-                                placeholderTextColor={colors.textSecondary}
-                                value={documentName}
-                                onChangeText={setDocumentName}
-                                editable={!isUploading} // Disable editing while uploading
-                            />
-                            {documentName.trim() && !isUploading && (
-                                <TouchableOpacity onPress={() => setDocumentName("")} style={styles.clearButton}>
-                                    <Feather name="x" size={20} color={colors.textSecondary} />
-                                </TouchableOpacity>
-                            )}
-                        </View>
-                        {!documentName.trim() && (
-                            <Text style={styles.warningText}>
-                                <Feather name="info" size={14} color={colors.printRequest} /> Document name cannot be empty
-                            </Text>
-                        )}
-                    </View>
-                )}
+					{/* Document cards list */}
+					{hasDocuments && (
+						<View style={styles.documentsList}>
+							{documents.map((doc, index) => (
+								<DocumentCard
+									key={`${doc.file.uri}-${index}`}
+									doc={doc}
+									index={index}
+									onRemove={handleRemoveDocument}
+									onUpdateName={handleUpdateName}
+								/>
+							))}
+						</View>
+					)}
 
-                {isDocumentUploaded && (
-                    <View style={styles.summaryCard}>
-                        {/* Summary Items ... */}
-                        <View style={styles.summaryItem}>
-                            <Text style={styles.summaryLabel}>Shop ID</Text>
-                            <Text style={styles.summaryValue}>{shopId}</Text>
-                        </View>
-                        <View style={styles.summaryDivider} />
-                        <View style={styles.summaryItem}>
-                            <Text style={styles.summaryLabel}>Document Name</Text>
-                            <Text style={styles.summaryValue}>{documentName || "Not provided"}</Text>
-                        </View>
-                        <View style={styles.summaryDivider} />
-                        <View style={styles.summaryItem}>
-                            <Text style={styles.summaryLabel}>File</Text>
-                            <Text style={styles.summaryValue}>{document.name}</Text>
-                        </View>
-                    </View>
-                )}
-            </ScrollView>
+					{/* Add more files button */}
+					{hasDocuments && !loading && (
+						<TouchableOpacity
+							style={styles.addMoreButton}
+							onPress={handleDocumentPick}>
+							<Feather name="plus-circle" size={20} color={colors.primary} />
+							<Text style={styles.addMoreButtonText}>Add More Files</Text>
+						</TouchableOpacity>
+					)}
 
-            <View style={styles.footer}>
-                <TouchableOpacity
-                    style={[
-                        styles.continueButton, 
-                        (!isDocumentUploaded || !documentName.trim() || isUploading) && styles.continueButtonDisabled
-                    ]}
-                    onPress={handleContinue}
-                    disabled={!isDocumentUploaded || !documentName.trim() || isUploading}>
-                    
-                    {/* Show Spinner inside button if Uploading/Checking */}
-                    {isUploading ? (
-                        <ActivityIndicator size="small" color={colors.cardBackground} />
-                    ) : (
-                        <>
-                            <Text style={styles.continueButtonText}>Continue</Text>
-                            <Feather name="arrow-right" size={20} color={colors.cardBackground} />
-                        </>
-                    )}
-                </TouchableOpacity>
+					{error && (
+						<View style={styles.errorBox}>
+							<Feather
+								name="alert-circle"
+								size={18}
+								color={colors.printRequest}
+							/>
+							<Text style={styles.errorText}>{error}</Text>
+						</View>
+					)}
+				</View>
 
-                {isDocumentUploaded && documentName.trim() && !isUploading && (
-                    <TouchableOpacity style={styles.removeButton} onPress={handleRemoveDocument}>
-                        <Text style={styles.removeButtonText}>Remove Document</Text>
-                    </TouchableOpacity>
-                )}
-            </View>
-        </SafeAreaView>
-    );
+				{/* Summary Card */}
+				{hasDocuments && (
+					<View style={styles.summaryCard}>
+						<View style={styles.summaryItem}>
+							<Text style={styles.summaryLabel}>Shop ID</Text>
+							<Text style={styles.summaryValue}>{shopId}</Text>
+						</View>
+						<View style={styles.summaryDivider} />
+						<View style={styles.summaryItem}>
+							<Text style={styles.summaryLabel}>Total Documents</Text>
+							<Text style={styles.summaryValue}>{documents.length} file{documents.length !== 1 ? "s" : ""}</Text>
+						</View>
+						<View style={styles.summaryDivider} />
+						<View style={styles.summaryItem}>
+							<Text style={styles.summaryLabel}>Total Size</Text>
+							<Text style={styles.summaryValue}>{(totalSize / 1024).toFixed(2)} KB</Text>
+						</View>
+					</View>
+				)}
+			</ScrollView>
+			<View style={styles.footer}>
+				<TouchableOpacity
+					style={[styles.continueButton, (!hasDocuments || !allNamesValid) && styles.continueButtonDisabled]}
+					onPress={handleContinue}
+					disabled={!hasDocuments || !allNamesValid}>
+					<Text style={styles.continueButtonText}>Continue</Text>
+					<Feather
+						name="arrow-right"
+						size={20}
+						color={colors.cardBackground}
+					/>
+				</TouchableOpacity>
+
+				{hasDocuments && (
+					<TouchableOpacity
+						style={styles.removeButton}
+						onPress={handleRemoveAll}>
+						<Text style={styles.removeButtonText}>Remove All Documents</Text>
+					</TouchableOpacity>
+				)}
+			</View>
+		</SafeAreaView>
+	);
 };
 
-// ... Styles remain exactly the same ...
+//----------------------------------- STYLES -----------------------------------//
+
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
@@ -310,13 +376,7 @@ const styles = StyleSheet.create({
 		fontSize: 16,
 		fontWeight: "700",
 		color: colors.textPrimary,
-		marginBottom: 8,
-	},
-	sectionDescription: {
-		fontSize: 13,
-		color: colors.textSecondary,
 		marginBottom: 16,
-		lineHeight: 18,
 	},
 	uploadArea: {
 		borderWidth: 2,
@@ -332,10 +392,6 @@ const styles = StyleSheet.create({
 	uploadAreaFilled: {
 		borderColor: colors.primary,
 		backgroundColor: "rgba(0, 217, 163, 0.05)",
-	},
-	uploadAreaError: {
-		borderColor: colors.printRequest,
-		backgroundColor: "rgba(255, 139, 123, 0.05)",
 	},
 	uploadText: {
 		fontSize: 18,
@@ -356,46 +412,119 @@ const styles = StyleSheet.create({
 		color: colors.textSecondary,
 		marginTop: 16,
 	},
-	uploadedIconContainer: {
+
+	// Document card styles
+	documentsList: {
+		gap: 12,
+	},
+	documentCard: {
+		backgroundColor: colors.background,
+		borderRadius: 14,
+		borderWidth: 1,
+		borderColor: colors.borderLight,
+		padding: 14,
+	},
+	documentCardHeader: {
+		flexDirection: "row",
+		alignItems: "center",
+		gap: 12,
 		marginBottom: 12,
 	},
-	uploadedText: {
-		fontSize: 16,
-		fontWeight: "700",
-		color: colors.primary,
-		marginBottom: 8,
-		textAlign: "center",
+	documentIconContainer: {
+		width: 44,
+		height: 44,
+		borderRadius: 10,
+		backgroundColor: "rgba(0, 217, 163, 0.1)",
+		justifyContent: "center",
+		alignItems: "center",
 	},
-	uploadedFileName: {
+	extensionBadge: {
+		fontSize: 8,
+		fontWeight: "800",
+		color: colors.primary,
+		marginTop: 2,
+	},
+	documentInfo: {
+		flex: 1,
+	},
+	documentOriginalName: {
 		fontSize: 14,
 		fontWeight: "600",
 		color: colors.textPrimary,
-		textAlign: "center",
-		marginBottom: 4,
+		marginBottom: 2,
 	},
-	uploadedFileSize: {
+	documentFileSize: {
 		fontSize: 12,
 		color: colors.textSecondary,
-		textAlign: "center",
 	},
-	changeButton: {
+	removeCardButton: {
+		width: 32,
+		height: 32,
+		borderRadius: 8,
+		backgroundColor: "rgba(255, 139, 123, 0.1)",
+		justifyContent: "center",
+		alignItems: "center",
+	},
+	documentNameInput: {
+		borderTopWidth: 1,
+		borderTopColor: colors.borderLight,
+		paddingTop: 12,
+	},
+	documentNameLabel: {
+		fontSize: 11,
+		fontWeight: "600",
+		color: colors.textSecondary,
+		textTransform: "uppercase",
+		letterSpacing: 0.5,
+		marginBottom: 6,
+	},
+	nameInputRow: {
+		flexDirection: "row",
+		alignItems: "center",
+		borderWidth: 1,
+		borderColor: colors.borderLight,
+		borderRadius: 10,
+		paddingHorizontal: 12,
+		backgroundColor: colors.cardBackground,
+	},
+	cardNameInput: {
+		flex: 1,
+		paddingVertical: 10,
+		fontSize: 14,
+		color: colors.textPrimary,
+	},
+	clearButton: {
+		padding: 6,
+		marginLeft: 4,
+	},
+	cardWarningText: {
+		fontSize: 11,
+		color: colors.printRequest,
+		marginTop: 6,
+		lineHeight: 16,
+	},
+
+	// Add more button
+	addMoreButton: {
 		flexDirection: "row",
 		alignItems: "center",
 		justifyContent: "center",
-		marginTop: 16,
-		paddingVertical: 12,
+		marginTop: 14,
+		paddingVertical: 14,
 		paddingHorizontal: 20,
-		borderWidth: 1,
-		borderColor: colors.borderLight,
+		borderWidth: 1.5,
+		borderColor: colors.primary,
 		borderRadius: 12,
-		backgroundColor: colors.cardBackground,
+		borderStyle: "dashed",
+		backgroundColor: "rgba(0, 217, 163, 0.04)",
 		gap: 8,
 	},
-	changeButtonText: {
+	addMoreButtonText: {
 		fontSize: 14,
 		fontWeight: "600",
-		color: colors.textPrimary,
+		color: colors.primary,
 	},
+
 	errorBox: {
 		flexDirection: "row",
 		alignItems: "flex-start",
@@ -411,31 +540,8 @@ const styles = StyleSheet.create({
 		flex: 1,
 		lineHeight: 18,
 	},
-	nameInputContainer: {
-		flexDirection: "row",
-		alignItems: "center",
-		borderWidth: 1,
-		borderColor: colors.borderLight,
-		borderRadius: 12,
-		paddingHorizontal: 16,
-		backgroundColor: colors.background,
-		marginBottom: 12,
-	},
-	nameInput: {
-		flex: 1,
-		paddingVertical: 14,
-		fontSize: 16,
-		color: colors.textPrimary,
-	},
-	clearButton: {
-		padding: 8,
-		marginLeft: 8,
-	},
-	warningText: {
-		fontSize: 12,
-		color: colors.printRequest,
-		lineHeight: 16,
-	},
+
+	// Summary card
 	summaryCard: {
 		backgroundColor: colors.background,
 		borderRadius: 16,
@@ -465,6 +571,8 @@ const styles = StyleSheet.create({
 		backgroundColor: colors.borderLight,
 		marginVertical: 12,
 	},
+
+	// Footer
 	footer: {
 		position: "absolute",
 		bottom: 0,

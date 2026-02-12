@@ -32,14 +32,21 @@ const PrintSettings = () => {
 	const [startPage, setStartPage] = useState("");
 	const [endPage, setEndPage] = useState("");
 
-	const { shopId, documentName, documentUri, documentSize, documentMimeType } = params;
+	const { shopId, documents: documentsParam } = params;
+
+	let parsedDocuments = [];
+	try {
+		parsedDocuments = JSON.parse(documentsParam || "[]");
+	} catch (e) {
+		console.error("Failed to parse documents param:", e);
+	}
 
 	useEffect(() => {
-		if (!shopId || !documentName || !documentUri) {
+		if (!shopId || parsedDocuments.length === 0) {
 			Alert.alert("Error", "Missing required document information.");
 			router.back();
 		}
-	}, [router, shopId, documentName, documentUri]);
+	}, [router, shopId, parsedDocuments.length]);
 
 	const handlePageRangeChange = (value) => {
 		setPageRange(value);
@@ -101,10 +108,12 @@ const PrintSettings = () => {
 			setError(null);
 
 			const form = new FormData();
-			form.append("document", {
-				uri: documentUri,
-				name: documentName || "document.pdf",
-				type: documentMimeType || "application/octet-stream",
+			parsedDocuments.forEach((doc) => {
+				form.append("document", {
+					uri: doc.uri,
+					name: doc.name || "document.pdf",
+					type: doc.mimeType || "application/octet-stream",
+				});
 			});
 			form.append("shopId", shopId);
 			form.append("colorMode", colorMode);
@@ -214,13 +223,15 @@ const PrintSettings = () => {
 					keyboardShouldPersistTaps="handled">
 					<View style={styles.summaryCard}>
 						<View style={styles.summaryItem}>
-							<Text style={styles.summaryLabel}>Document</Text>
-							<Text style={styles.summaryValue}>{documentName}</Text>
+							<Text style={styles.summaryLabel}>Documents ({parsedDocuments.length})</Text>
+							{parsedDocuments.map((doc, i) => (
+								<Text key={i} style={styles.summaryValue}>{doc.name}</Text>
+							))}
 						</View>
 						<View style={styles.summaryDivider} />
 						<View style={styles.summaryItem}>
-							<Text style={styles.summaryLabel}>File Size</Text>
-							<Text style={styles.summaryValue}>{((documentSize || 0) / 1024).toFixed(2)} KB</Text>
+							<Text style={styles.summaryLabel}>Total Size</Text>
+							<Text style={styles.summaryValue}>{(parsedDocuments.reduce((sum, d) => sum + (d.size || 0), 0) / 1024).toFixed(2)} KB</Text>
 						</View>
 					</View>
 
