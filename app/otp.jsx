@@ -1,4 +1,3 @@
-
 //----------------------------------- IMPORTS -----------------------------------//
 
 import { Ionicons } from "@expo/vector-icons";
@@ -73,7 +72,7 @@ const VerifyCode = () => {
 				console.log(body);
 				await SecureStore.setItemAsync("authToken", body.data.token);
 				console.log("OTP verified successfully for", phoneNumber);
-				
+
 				if (body.data.profile && body.data.profile.name) {
 					await SecureStore.setItemAsync("name", body.data.profile.name);
 					router.replace("/(tabs)/home");
@@ -186,7 +185,10 @@ const VerifyCode = () => {
 							style={styles.resendButton}
 							disabled={resending}>
 							{resending ? (
-								<ActivityIndicator color={colors.textPrimary} size="small" />
+								<ActivityIndicator
+									color={colors.textPrimary}
+									size="small"
+								/>
 							) : (
 								<Text style={styles.resendText}>Resend code</Text>
 							)}

@@ -1,4 +1,3 @@
-
 //----------------------------------- IMPORTS -----------------------------------//
 
 import { Feather } from "@expo/vector-icons";
@@ -86,7 +85,6 @@ const PrintSettings = () => {
 	};
 
 	const handleSubmit = async () => {
-
 		const token = await SecureStore.getItemAsync("authToken");
 		if (!colorMode || !orientation || !sidedness || !pageRange || !numberOfCopies || !pageSize) {
 			Alert.alert("Incomplete Settings", "Please select all print settings.");
@@ -128,7 +126,6 @@ const PrintSettings = () => {
 			}
 
 			form.append("numberOfCopies", copies);
-			
 
 			console.log("Submitting print job");
 
@@ -189,7 +186,7 @@ const PrintSettings = () => {
 		</View>
 	);
 
-//----------------------------------- RENDER -----------------------------------//
+	//----------------------------------- RENDER -----------------------------------//
 
 	return (
 		<SafeAreaView
@@ -225,7 +222,11 @@ const PrintSettings = () => {
 						<View style={styles.summaryItem}>
 							<Text style={styles.summaryLabel}>Documents ({parsedDocuments.length})</Text>
 							{parsedDocuments.map((doc, i) => (
-								<Text key={i} style={styles.summaryValue}>{doc.name}</Text>
+								<Text
+									key={i}
+									style={styles.summaryValue}>
+									{doc.name}
+								</Text>
 							))}
 						</View>
 						<View style={styles.summaryDivider} />

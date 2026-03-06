@@ -1,4 +1,3 @@
-
 //----------------------------------- IMPORTS -----------------------------------//
 
 import { Feather } from "@expo/vector-icons";
@@ -32,7 +31,6 @@ const NewPrint = () => {
 			setLoading(true);
 			setError(null);
 			const token = await SecureStore.getItemAsync("authToken");
-			console.log(token);
 			const response = await fetch(`${API_BASE_URL}/shops`, {
 				headers: {
 					Authorization: `Bearer ${token}`,
@@ -69,7 +67,7 @@ const NewPrint = () => {
 		router.push({ pathname: "/upload-document", params: { shopId: selectedShop } });
 	};
 
-//----------------------------------- RENDER -----------------------------------//
+	//----------------------------------- RENDER -----------------------------------//
 
 	return (
 		<SafeAreaView
@@ -254,6 +252,7 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 		backgroundColor: colors.cardBackground,
 		padding: 20,
+		marginTop: 8,
 	},
 	errorText: {
 		marginTop: 16,
@@ -267,6 +266,7 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 32,
 		paddingVertical: 12,
 		borderRadius: 12,
+		marginTop: 8,
 	},
 	retryButtonText: {
 		fontSize: 16,
@@ -384,6 +384,14 @@ const styles = StyleSheet.create({
 		fontSize: 16,
 		fontWeight: "700",
 		color: colors.cardBackground,
+	},
+	emptyContainer: {
+		padding: 20,
+		display: "flex",
+		flexDirection: "column",
+		gap: 10,
+		justifyContent: "center",
+		alignItems: "center",
 	},
 });
 export default NewPrint;

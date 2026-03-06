@@ -1,4 +1,3 @@
-
 //----------------------------------- IMPORTS -----------------------------------//
 
 import { Ionicons } from "@expo/vector-icons";
@@ -28,31 +27,29 @@ const Login = () => {
 
 	useEffect(() => {
 		(async () => {
-			try{
+			try {
 				const token = await SecureStore.getItemAsync("authToken");
 				if (token) {
 					console.log("Token found:", token);
 					await SplashScreen.hideAsync();
 					router.replace("(tabs)/home");
-				}
-				else{
+				} else {
 					setReady(true);
 				}
-			}
-			catch(error){
+			} catch (error) {
 				console.log("Error fetching token:", error);
 				setReady(true);
 			}
 		})();
-	}, []);
+	}, [router]);
 
 	const onLayoutRootView = useCallback(async () => {
 		if (isReady) {
 			await SplashScreen.hideAsync();
 		}
 	}, [isReady]);
-	
-	if(!isReady){
+
+	if (!isReady) {
 		return null;
 	}
 
@@ -79,6 +76,7 @@ const Login = () => {
 				body: JSON.stringify({ number: number }),
 			});
 			const data = await response.json();
+			console.log(data.message);
 			if (data.success) {
 				router.replace({ pathname: "/otp", params: { phone: number } });
 			} else {
@@ -114,7 +112,7 @@ const Login = () => {
 		return countryCode;
 	};
 
-//----------------------------------- RENDER -----------------------------------//
+	//----------------------------------- RENDER -----------------------------------//
 
 	return (
 		<KeyboardAvoidingView
@@ -126,7 +124,9 @@ const Login = () => {
 					setShowPicker(false);
 				}}
 				accessible={false}>
-				<SafeAreaView style={styles.container} onLayout={onLayoutRootView}>
+				<SafeAreaView
+					style={styles.container}
+					onLayout={onLayoutRootView}>
 					<Text style={styles.heading}>Let&apos;s get started!</Text>
 					<Text style={styles.subHeading}>Please enter your mobile number</Text>
 

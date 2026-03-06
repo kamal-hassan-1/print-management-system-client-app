@@ -1,10 +1,8 @@
-
 //----------------------------------- IMPORTS -----------------------------------//
 
 import { Feather } from "@expo/vector-icons";
 import * as DocumentPicker from "expo-document-picker";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import * as SecureStore from "expo-secure-store";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, Alert, ScrollView, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -24,17 +22,29 @@ const DocumentCard = ({ doc, index, onRemove, onUpdateName }) => {
 		<View style={styles.documentCard}>
 			<View style={styles.documentCardHeader}>
 				<View style={styles.documentIconContainer}>
-					<Feather name="file-text" size={22} color={colors.primary} />
+					<Feather
+						name="file-text"
+						size={22}
+						color={colors.primary}
+					/>
 					<Text style={styles.extensionBadge}>{extension}</Text>
 				</View>
 				<View style={styles.documentInfo}>
-					<Text style={styles.documentOriginalName} numberOfLines={1}>{doc.file.name}</Text>
+					<Text
+						style={styles.documentOriginalName}
+						numberOfLines={1}>
+						{doc.file.name}
+					</Text>
 					<Text style={styles.documentFileSize}>{(doc.file.size / 1024).toFixed(2)} KB</Text>
 				</View>
 				<TouchableOpacity
 					style={styles.removeCardButton}
 					onPress={() => onRemove(index)}>
-					<Feather name="x" size={18} color={colors.printRequest} />
+					<Feather
+						name="x"
+						size={18}
+						color={colors.printRequest}
+					/>
 				</TouchableOpacity>
 			</View>
 			<View style={styles.documentNameInput}>
@@ -51,13 +61,21 @@ const DocumentCard = ({ doc, index, onRemove, onUpdateName }) => {
 						<TouchableOpacity
 							onPress={() => onUpdateName(index, "")}
 							style={styles.clearButton}>
-							<Feather name="x" size={16} color={colors.textSecondary} />
+							<Feather
+								name="x"
+								size={16}
+								color={colors.textSecondary}
+							/>
 						</TouchableOpacity>
 					)}
 				</View>
 				{!doc.name.trim() && (
 					<Text style={styles.cardWarningText}>
-						<Feather name="info" size={12} color={colors.printRequest} />{" "}
+						<Feather
+							name="info"
+							size={12}
+							color={colors.printRequest}
+						/>{" "}
 						Name cannot be empty
 					</Text>
 				)}
@@ -87,7 +105,17 @@ const UploadDocument = () => {
 			setLoading(true);
 
 			const result = await DocumentPicker.getDocumentAsync({
-				type: ["application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "text/plain", "image/jpeg", "image/png", "image/jpg"],
+				type: [
+					"application/pdf",
+					"application/msword",
+					"application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+					"application/vnd.ms-excel",
+					"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+					"text/plain",
+					"image/jpeg",
+					"image/png",
+					"image/jpg",
+				],
 				copyToCacheDirectory: true,
 				multiple: true,
 			});
@@ -113,9 +141,7 @@ const UploadDocument = () => {
 	};
 
 	const handleUpdateName = (index, newName) => {
-		setDocuments((prev) =>
-			prev.map((doc, i) => (i === index ? { ...doc, name: newName } : doc))
-		);
+		setDocuments((prev) => prev.map((doc, i) => (i === index ? { ...doc, name: newName } : doc)));
 	};
 
 	const handleRemoveAll = () => {
@@ -126,75 +152,49 @@ const UploadDocument = () => {
 	};
 
 	const handleContinue = () => {
-		if (documents.length === 0) {
-			Alert.alert("No Documents", "Please upload at least one document to continue.");
-			return;
-		}
-		const emptyNameIndex = documents.findIndex((d) => !d.name.trim());
-		if (emptyNameIndex !== -1) {
-			Alert.alert("Invalid Name", `Please provide a name for document #${emptyNameIndex + 1}.`);
-			return;
-		}
-		const allDocumentsAreUploaded = [];
-		const fileHashes = [];
-		const UploadDocuments = async () => {
-			documents.map( async (d) => {
-				const formData = new FormData();
-				formData.append("file", {
-					uri: d.file.uri,
-					name: d.file.name,
-					type: d.file.mimeType,
-				})
-				try{
-					const token = await SecureStore.getItemAsync("authToken");
-					const response = await fetch(`${API_BASE_URL}/files`, {
-						method: "POST",
-						headers: {
-							"Authorization": `Bearer ${token}`,
-						},
-						body: formData,
-					})
-					const body = await response.json();
-					
-					if(response.status === 202){
-						allDocumentsAreUploaded.push(true);
-						fileHashes.push(body.data.hash);
-					}else if(response.status === 200){
-						allDocumentsAreUploaded.push(false);
-					}else{
-						//code to be written
-					}
-				}
-				catch(err){
-					console.error("Error uploading document:", err);
-					setError("Failed to upload document. Please try again.");
-				}
-			});
-		}
-		UploadDocuments();
-		let proceed = true;
-		for(let i = 0; i < allDocumentsAreUploaded.length; i++){
-			if(allDocumentsAreUploaded[i] === false){
-				proceed = false;
-				break;
-			}
-		}
-		if(proceed){
-			router.push({
-				pathname: "/print-settings",
-				params: {
-					shopId: shopId,
-					fileHashes: fileHashes,
-				}
-			})
-		}
+		// const allDocumentsAreUploaded = [];
+		// const fileHashes = [];
+		// function uploadDocuments() {
+		// documents.map(async (d) => {
+		// 	const formData = new FormData();
+		// 	formData.append("file", {
+		// 		uri: d.file.uri,
+		// 		name: d.file.name,
+		// 		type: d.file.mimeType,
+		// 	});
+		// 	console.log(formData);
+		// 	try {
+		// 		const token = await SecureStore.getItemAsync("authToken");
+		// 		const response = await fetch(`${API_BASE_URL}/files`, {
+		// 			method: "POST",
+		// 			headers: {
+		// 				Authorization: `Bearer ${token}`,
+		// 			},
+		// 			body: formData,
+		// 		});
+		// 		const body = await response.json();
+		// 		if (response.status === 202) {
+		// 			allDocumentsAreUploaded.push(true);
+		// 			fileHashes.push(body.data.hash);
+		// 		} else if (response.status === 200) {
+		// 			allDocumentsAreUploaded.push(false);
+		// 		} else {
+		// 			//code to be written
+		// 		}
+		// 	} catch (err) {
+		// 		console.error("Error uploading document:", err);
+		// 		setError("Failed to upload document. Please try again.");
+		// 	}});
+		// }
+		router.push({ pathname: "/print-settings", params: { shopId: shopId } });
+		console.log("in handle continue, shopId:", shopId);
 	};
 
 	const hasDocuments = documents.length > 0;
 	const allNamesValid = documents.every((d) => d.name.trim());
 	const totalSize = documents.reduce((sum, d) => sum + (d.file.size || 0), 0);
 
-//----------------------------------- RENDER -----------------------------------//
+	//----------------------------------- RENDER -----------------------------------//
 
 	return (
 		<SafeAreaView
@@ -221,9 +221,7 @@ const UploadDocument = () => {
 				style={styles.scrollView}
 				contentContainerStyle={styles.scrollContent}>
 				<View style={styles.section}>
-					<Text style={styles.sectionTitle}>
-						Documents {hasDocuments ? `(${documents.length})` : ""}
-					</Text>
+					<Text style={styles.sectionTitle}>Documents {hasDocuments ? `(${documents.length})` : ""}</Text>
 
 					{/* Empty state - upload area */}
 					{!hasDocuments && !loading && (
@@ -243,7 +241,10 @@ const UploadDocument = () => {
 					{/* Loading state */}
 					{loading && (
 						<View style={[styles.uploadArea, styles.uploadAreaFilled]}>
-							<ActivityIndicator size="large" color={colors.primary} />
+							<ActivityIndicator
+								size="large"
+								color={colors.primary}
+							/>
 							<Text style={styles.uploadLoadingText}>Processing...</Text>
 						</View>
 					)}
@@ -268,7 +269,11 @@ const UploadDocument = () => {
 						<TouchableOpacity
 							style={styles.addMoreButton}
 							onPress={handleDocumentPick}>
-							<Feather name="plus-circle" size={20} color={colors.primary} />
+							<Feather
+								name="plus-circle"
+								size={20}
+								color={colors.primary}
+							/>
 							<Text style={styles.addMoreButtonText}>Add More Files</Text>
 						</TouchableOpacity>
 					)}
@@ -295,7 +300,9 @@ const UploadDocument = () => {
 						<View style={styles.summaryDivider} />
 						<View style={styles.summaryItem}>
 							<Text style={styles.summaryLabel}>Total Documents</Text>
-							<Text style={styles.summaryValue}>{documents.length} file{documents.length !== 1 ? "s" : ""}</Text>
+							<Text style={styles.summaryValue}>
+								{documents.length} file{documents.length !== 1 ? "s" : ""}
+							</Text>
 						</View>
 						<View style={styles.summaryDivider} />
 						<View style={styles.summaryItem}>
