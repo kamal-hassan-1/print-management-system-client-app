@@ -1,4 +1,3 @@
-
 //----------------------------------- IMPORTS -----------------------------------//
 
 import { Feather } from "@expo/vector-icons";
@@ -7,10 +6,10 @@ import * as SecureStore from "expo-secure-store";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, Alert, Dimensions, RefreshControl, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import TransactionList from "../../components/TransactionList";
 import config from "../../config/config";
 import { colors } from "../../constants/colors";
 import { useTransactions } from "../../hooks/useTransactions";
+import TransactionList from "../components/TransactionList";
 
 //----------------------------------- CONSTANTS -----------------------------------//
 
@@ -29,38 +28,39 @@ const HomePage = () => {
 	}, []);
 
 	const fetchBalance = async () => {
-			try {
-				const token = await SecureStore.getItemAsync("authToken");
-				const response = await fetch(`${API_BASE_URL}/profile`, {
-					headers: {
-						Authorization: `Bearer ${token}`,
-					},
-				});
-				const body = await response.json();
-				if (body.success) {
-					console.log("Balance:",body.data.profile.balance);
-					setAccountBalance(body.data.profile.balance);
-				}
-			} catch (error) {
-				console.error("Error fetching account balance:", error);
+		try {
+			const token = await SecureStore.getItemAsync("authToken");
+			const response = await fetch(`${API_BASE_URL}/profile`, {
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			});
+			const body = await response.json();
+			if (body.success) {
+				console.log("Balance:", body.data.profile.balance);
+				setAccountBalance(body.data.profile.balance);
 			}
-		};
+		} catch (error) {
+			console.error("Error fetching account balance:", error);
+		}
+	};
 
 	const refreshAll = () => {
 		refresh();
 		fetchBalance();
-	}
+	};
 
 	if (error) {
 		return (
 			<View style={styles.centerContainer}>
 				<Text style={styles.errorText}>Error loading transactions</Text>
-				<TouchableOpacity onPress={refresh} style={styles.retryButton}>
+				<TouchableOpacity
+					onPress={refresh}
+					style={styles.retryButton}>
 					<Text style={styles.retryText}>Retry</Text>
 				</TouchableOpacity>
 			</View>
 		);
-		
 	}
 	return (
 		<SafeAreaView
@@ -80,7 +80,6 @@ const HomePage = () => {
 						onRefresh={refreshAll}
 					/>
 				}>
-
 				<View style={styles.topCardsContainer}>
 					<View style={styles.cardsRow}>
 						{/* Current Balance Card */}
@@ -141,19 +140,19 @@ const HomePage = () => {
 							<Text style={styles.seeAllText}>See All</Text>
 						</TouchableOpacity>
 					</View>
-                    {loading ? (
-                        <View style={styles.loadingContainer}>
-                            <ActivityIndicator 
-                                size="large" 
-                                color={colors.primary} 
-                            />
-                        </View>
-                    ) : (
-                        <TransactionList
-                            transactions={transactions}
-                            limit={3}
-                        />
-                    )}
+					{loading ? (
+						<View style={styles.loadingContainer}>
+							<ActivityIndicator
+								size="large"
+								color={colors.primary}
+							/>
+						</View>
+					) : (
+						<TransactionList
+							transactions={transactions}
+							limit={3}
+						/>
+					)}
 				</View>
 			</ScrollView>
 		</SafeAreaView>

@@ -5,13 +5,13 @@ export default {
 		slug: "Click Print",
 		version: "1.0.0",
 		orientation: "portrait",
-		icon: "./assets/images/icon.png",
+		icon: "./assets/icon.png",
 		scheme: "Click Print",
 		userInterfaceStyle: "automatic",
 		splash: {
-			image: "./assets/images/icon.png",
+			image: "./assets/icon.png",
 			resizeMode: "cover",
-			backgroundColor: "#000000",
+			backgroundColor: "#fff",
 		},
 		newArchEnabled: true,
 		ios: {
@@ -20,9 +20,9 @@ export default {
 		android: {
 			adaptiveIcon: {
 				backgroundColor: "#E6F4FE",
-				foregroundImage: "./assets/images/icon.png",
-				backgroundImage: "./assets/images/icon.png",
-				monochromeImage: "./assets/images/icon.png",
+				foregroundImage: "./assets/icon.png",
+				backgroundImage: "./assets/icon.png",
+				monochromeImage: "./assets/icon.png",
 			},
 			edgeToEdgeEnabled: true,
 			predictiveBackGestureEnabled: false,
@@ -30,14 +30,14 @@ export default {
 		},
 		web: {
 			output: "static",
-			favicon: "./assets/images/icon.png",
+			favicon: "./assets/icon.png",
 		},
 		plugins: [
 			"expo-router",
 			[
 				"expo-splash-screen",
 				{
-					image: "./assets/images/icon.png",
+					image: "./assets/icon.png",
 					imageWidth: 200,
 					resizeMode: "contain",
 					backgroundColor: "#ffffff",

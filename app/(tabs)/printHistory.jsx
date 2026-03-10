@@ -1,13 +1,12 @@
-
 //----------------------------------- IMPORTS -----------------------------------//
 
 import { Feather } from "@expo/vector-icons";
 import { useMemo, useState } from "react";
 import { ActivityIndicator, Modal, RefreshControl, ScrollView, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import TransactionList from "../../components/TransactionList";
 import { colors } from "../../constants/colors";
 import { useTransactions } from "../../hooks/useTransactions";
+import TransactionList from "../components/TransactionList";
 
 //----------------------------------- COMPONENTS -----------------------------------//
 
@@ -75,7 +74,7 @@ const PrintHistory = () => {
 		return count;
 	};
 
-//----------------------------------- RENDER -----------------------------------//
+	//----------------------------------- RENDER -----------------------------------//
 
 	if (loading) {
 		return (
@@ -371,7 +370,7 @@ const PrintHistory = () => {
 						</TouchableOpacity>
 
 						{/* Apply Button */}
-						
+
 						<TouchableOpacity
 							style={styles.applyButton}
 							onPress={() => setSortModalVisible(false)}>

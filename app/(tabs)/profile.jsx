@@ -6,7 +6,7 @@ import * as SecureStore from "expo-secure-store";
 import { useEffect, useState } from "react";
 import { Alert, Image, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import avatar from "../../assets/images/9090692.jpg";
+import avatar from "../../assets/profileAvatar.jpg";
 import { colors } from "../../constants/colors";
 
 // ----------------------------------- COMPONENTS -----------------------------------//
