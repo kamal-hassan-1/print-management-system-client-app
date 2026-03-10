@@ -7,16 +7,12 @@ import { useEffect, useState } from "react";
 import { Alert, Image, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import avatar from "../../assets/images/9090692.jpg";
-import config from "../../config/config";
 import { colors } from "../../constants/colors";
 
-//----------------------------------- CONSTANTS -----------------------------------//
-
-const API_BASE_URL = config.apiBaseUrl;
 // ----------------------------------- COMPONENTS -----------------------------------//
 
 const fetchUserName = async () => {
-	const name = await SecureStore.getItemAsync("name") ?? "John Doe";
+	const name = (await SecureStore.getItemAsync("name")) ?? "John Doe";
 	return name;
 };
 
@@ -55,7 +51,7 @@ const Profile = () => {
 		]);
 	};
 
-//----------------------------------- STYLES -----------------------------------//
+	//----------------------------------- STYLES -----------------------------------//
 
 	return (
 		<SafeAreaView
@@ -72,7 +68,10 @@ const Profile = () => {
 				showsVerticalScrollIndicator={false}>
 				{/* Profile Header */}
 				<View style={styles.profileHeader}>
-					<Image source={avatar} style={styles.avatarContainer}/>
+					<Image
+						source={avatar}
+						style={styles.avatarContainer}
+					/>
 					<Text style={styles.userName}>{userName}</Text>
 				</View>
 

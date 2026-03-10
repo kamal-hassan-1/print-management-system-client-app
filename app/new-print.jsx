@@ -64,7 +64,7 @@ const NewPrint = () => {
 
 		const shop = shops.find((s) => s._id === selectedShop);
 		console.log("Continuing with shop:", shop);
-		router.push({ pathname: "/upload-document", params: { shopId: selectedShop } });
+		router.push({ pathname: "/upload-document", params: { shopId: selectedShop, shopName: shop.name } });
 	};
 
 	//----------------------------------- RENDER -----------------------------------//
@@ -135,9 +135,9 @@ const NewPrint = () => {
 						{shops.map((shop) => {
 							return (
 								<ShopCard
-									key={shop._id || shop.id} // Fallback key to prevent crash while debugging
+									key={shop._id}
 									shop={shop}
-									isSelected={selectedShop && (selectedShop === shop._id || selectedShop === shop.id)}
+									isSelected={selectedShop && selectedShop === shop._id}
 									onSelect={() => handleShopSelect(shop)}
 								/>
 							);

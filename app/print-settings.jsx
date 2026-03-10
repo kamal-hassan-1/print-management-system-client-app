@@ -8,6 +8,7 @@ import { ActivityIndicator, Alert, KeyboardAvoidingView, Platform, ScrollView, S
 import { SafeAreaView } from "react-native-safe-area-context";
 import config from "../config/config";
 import { colors } from "../constants/colors";
+import SettingRow from "./components/printSettings/SettingRow";
 
 //----------------------------------- CONSTANTS -----------------------------------//
 
@@ -41,7 +42,8 @@ const PrintSettings = () => {
 	}
 
 	useEffect(() => {
-		if (!shopId || parsedDocuments.length === 0) {
+		if (!shopId) {
+			// if (!shopId || parsedDocuments.length === 0) {
 			Alert.alert("Error", "Missing required document information.");
 			router.back();
 		}
@@ -85,6 +87,21 @@ const PrintSettings = () => {
 	};
 
 	const handleSubmit = async () => {
+		Alert.alert("Submit", "Ready to proceed?", [
+			{
+				text: "Cancel",
+				style: "cancel",
+			},
+			{
+				text: "Yes",
+				onPress: async () => {
+					createPrintJob();
+				},
+			},
+		]);
+	};
+
+	const createPrintJob = async () => {
 		const token = await SecureStore.getItemAsync("authToken");
 		if (!colorMode || !orientation || !sidedness || !pageRange || !numberOfCopies || !pageSize) {
 			Alert.alert("Incomplete Settings", "Please select all print settings.");
@@ -170,22 +187,6 @@ const PrintSettings = () => {
 		setNumberOfCopies(newCopies.toString());
 	};
 
-	const SettingRow = ({ label, options, selectedValue, onSelect }) => (
-		<View style={styles.settingRow}>
-			<Text style={styles.settingLabel}>{label}</Text>
-			<View style={styles.buttonsContainer}>
-				{options.map((option) => (
-					<TouchableOpacity
-						key={option.value}
-						style={[styles.optionButton, selectedValue === option.value && styles.optionButtonActive]}
-						onPress={() => onSelect(option.value)}>
-						<Text style={[styles.optionButtonText, selectedValue === option.value && styles.optionButtonTextActive]}>{option.label}</Text>
-					</TouchableOpacity>
-				))}
-			</View>
-		</View>
-	);
-
 	//----------------------------------- RENDER -----------------------------------//
 
 	return (
@@ -265,8 +266,8 @@ const PrintSettings = () => {
 						<SettingRow
 							label="Sidedness"
 							options={[
-								{ label: "Single Sided", value: "single" },
-								{ label: "Double Sided", value: "double" },
+								{ label: "Single", value: "single" },
+								{ label: "Double", value: "double" },
 							]}
 							selectedValue={sidedness}
 							onSelect={setSidedness}
@@ -502,7 +503,7 @@ const styles = StyleSheet.create({
 		flexDirection: "row",
 		gap: 12,
 		flex: 0.6,
-		justifyContent: "flex-end",
+		justifyContent: "flex-start",
 	},
 	optionButton: {
 		paddingVertical: 10,
@@ -511,6 +512,7 @@ const styles = StyleSheet.create({
 		borderWidth: 1.5,
 		borderColor: colors.navInactive,
 		backgroundColor: colors.cardBackground,
+		flex: 1,
 	},
 	optionButtonActive: {
 		backgroundColor: colors.printRequest,
@@ -520,6 +522,7 @@ const styles = StyleSheet.create({
 		fontSize: 13,
 		fontWeight: "600",
 		color: colors.navInactive,
+		textAlign: "center",
 	},
 	optionButtonTextActive: {
 		color: colors.cardBackground,

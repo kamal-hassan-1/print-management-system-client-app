@@ -4,85 +4,16 @@ import { Feather } from "@expo/vector-icons";
 import * as DocumentPicker from "expo-document-picker";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { ActivityIndicator, Alert, ScrollView, StatusBar, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Alert, ScrollView, StatusBar, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import config from "../config/config";
 import { colors } from "../constants/colors";
+import DocumentCard from "./components/uploadDocument/DocumentCard";
 
 //----------------------------------- CONSTANTS ------------------------------------//
 
-const API_BASE_URL = config.apiBaseUrl;
+// const API_BASE_URL = config.apiBaseUrl;
 
 //----------------------------------- COMPONENTS -----------------------------------//
-
-const DocumentCard = ({ doc, index, onRemove, onUpdateName }) => {
-	const extension = doc.file.name ? doc.file.name.split(".").pop().toUpperCase() : "FILE";
-
-	return (
-		<View style={styles.documentCard}>
-			<View style={styles.documentCardHeader}>
-				<View style={styles.documentIconContainer}>
-					<Feather
-						name="file-text"
-						size={22}
-						color={colors.primary}
-					/>
-					<Text style={styles.extensionBadge}>{extension}</Text>
-				</View>
-				<View style={styles.documentInfo}>
-					<Text
-						style={styles.documentOriginalName}
-						numberOfLines={1}>
-						{doc.file.name}
-					</Text>
-					<Text style={styles.documentFileSize}>{(doc.file.size / 1024).toFixed(2)} KB</Text>
-				</View>
-				<TouchableOpacity
-					style={styles.removeCardButton}
-					onPress={() => onRemove(index)}>
-					<Feather
-						name="x"
-						size={18}
-						color={colors.printRequest}
-					/>
-				</TouchableOpacity>
-			</View>
-			<View style={styles.documentNameInput}>
-				<Text style={styles.documentNameLabel}>Display Name</Text>
-				<View style={styles.nameInputRow}>
-					<TextInput
-						style={styles.cardNameInput}
-						placeholder="Enter document name"
-						placeholderTextColor={colors.textSecondary}
-						value={doc.name}
-						onChangeText={(text) => onUpdateName(index, text)}
-					/>
-					{doc.name.trim() && (
-						<TouchableOpacity
-							onPress={() => onUpdateName(index, "")}
-							style={styles.clearButton}>
-							<Feather
-								name="x"
-								size={16}
-								color={colors.textSecondary}
-							/>
-						</TouchableOpacity>
-					)}
-				</View>
-				{!doc.name.trim() && (
-					<Text style={styles.cardWarningText}>
-						<Feather
-							name="info"
-							size={12}
-							color={colors.printRequest}
-						/>{" "}
-						Name cannot be empty
-					</Text>
-				)}
-			</View>
-		</View>
-	);
-};
 
 const UploadDocument = () => {
 	const router = useRouter();
@@ -92,6 +23,8 @@ const UploadDocument = () => {
 	const [error, setError] = useState(null);
 
 	const shopId = params.shopId;
+	const shopName = params.shopName;
+
 	useEffect(() => {
 		if (!shopId) {
 			Alert.alert("Error", "Shop ID not found. Please go back and select a shop.");
@@ -138,10 +71,6 @@ const UploadDocument = () => {
 
 	const handleRemoveDocument = (index) => {
 		setDocuments((prev) => prev.filter((_, i) => i !== index));
-	};
-
-	const handleUpdateName = (index, newName) => {
-		setDocuments((prev) => prev.map((doc, i) => (i === index ? { ...doc, name: newName } : doc)));
 	};
 
 	const handleRemoveAll = () => {
@@ -258,7 +187,6 @@ const UploadDocument = () => {
 									doc={doc}
 									index={index}
 									onRemove={handleRemoveDocument}
-									onUpdateName={handleUpdateName}
 								/>
 							))}
 						</View>
@@ -294,8 +222,8 @@ const UploadDocument = () => {
 				{hasDocuments && (
 					<View style={styles.summaryCard}>
 						<View style={styles.summaryItem}>
-							<Text style={styles.summaryLabel}>Shop ID</Text>
-							<Text style={styles.summaryValue}>{shopId}</Text>
+							<Text style={styles.summaryLabel}>Shop</Text>
+							<Text style={styles.summaryValue}>{shopName}</Text>
 						</View>
 						<View style={styles.summaryDivider} />
 						<View style={styles.summaryItem}>
@@ -419,98 +347,6 @@ const styles = StyleSheet.create({
 		color: colors.textSecondary,
 		marginTop: 16,
 	},
-
-	// Document card styles
-	documentsList: {
-		gap: 12,
-	},
-	documentCard: {
-		backgroundColor: colors.background,
-		borderRadius: 14,
-		borderWidth: 1,
-		borderColor: colors.borderLight,
-		padding: 14,
-	},
-	documentCardHeader: {
-		flexDirection: "row",
-		alignItems: "center",
-		gap: 12,
-		marginBottom: 12,
-	},
-	documentIconContainer: {
-		width: 44,
-		height: 44,
-		borderRadius: 10,
-		backgroundColor: "rgba(0, 217, 163, 0.1)",
-		justifyContent: "center",
-		alignItems: "center",
-	},
-	extensionBadge: {
-		fontSize: 8,
-		fontWeight: "800",
-		color: colors.primary,
-		marginTop: 2,
-	},
-	documentInfo: {
-		flex: 1,
-	},
-	documentOriginalName: {
-		fontSize: 14,
-		fontWeight: "600",
-		color: colors.textPrimary,
-		marginBottom: 2,
-	},
-	documentFileSize: {
-		fontSize: 12,
-		color: colors.textSecondary,
-	},
-	removeCardButton: {
-		width: 32,
-		height: 32,
-		borderRadius: 8,
-		backgroundColor: "rgba(255, 139, 123, 0.1)",
-		justifyContent: "center",
-		alignItems: "center",
-	},
-	documentNameInput: {
-		borderTopWidth: 1,
-		borderTopColor: colors.borderLight,
-		paddingTop: 12,
-	},
-	documentNameLabel: {
-		fontSize: 11,
-		fontWeight: "600",
-		color: colors.textSecondary,
-		textTransform: "uppercase",
-		letterSpacing: 0.5,
-		marginBottom: 6,
-	},
-	nameInputRow: {
-		flexDirection: "row",
-		alignItems: "center",
-		borderWidth: 1,
-		borderColor: colors.borderLight,
-		borderRadius: 10,
-		paddingHorizontal: 12,
-		backgroundColor: colors.cardBackground,
-	},
-	cardNameInput: {
-		flex: 1,
-		paddingVertical: 10,
-		fontSize: 14,
-		color: colors.textPrimary,
-	},
-	clearButton: {
-		padding: 6,
-		marginLeft: 4,
-	},
-	cardWarningText: {
-		fontSize: 11,
-		color: colors.printRequest,
-		marginTop: 6,
-		lineHeight: 16,
-	},
-
 	// Add more button
 	addMoreButton: {
 		flexDirection: "row",
