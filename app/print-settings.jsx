@@ -1,8 +1,3 @@
-// TODO: add advanced page range functionality like chrome where user can enter pages like 1,2,3,4-6,8,10-12
-// a btn to be showed when pageRange is custom that says advanced range, it toggles the start page and end page to a text field
-// the input to checked on each char by a regex, if false then the text box should have a red outline otherwise green, also submit btn
-// should be disabled if the page range is invalid. the create print job will send the string to the backend only if custom, no start page or end page, plus the start page should be a must, the end page should be optional, if not provided then it should print till the end of the document. eventually the start page and end page if used by user will be converted to the string and passed to the backend
-
 //----------------------------------- IMPORTS -----------------------------------//
 
 import { Feather } from "@expo/vector-icons";
@@ -18,6 +13,30 @@ import SettingRow from "./components/printSettings/SettingRow";
 //----------------------------------- CONSTANTS -----------------------------------//
 
 const API_BASE_URL = config.apiBaseUrl;
+const hardCodedHash = "sakjdsajdhashjsfkdjfjskahfjas";
+
+// Regex: matches patterns like 1 | 1,2 | 1-5 | 1,3,16-20,25 (optional spaces after commas)
+const PAGE_RANGE_REGEX = /^(\d+(-\d+)?)(,\s*\d+(-\d+)?)*$/;
+
+/**
+ * Validates advanced page range string:
+ * 1. Must match the PAGE_RANGE_REGEX pattern
+ * 2. In any range a-b, b must be >= a (no 2-1 or 3-1)
+ */
+const isValidAdvancedRange = (value) => {
+  if (!value || !PAGE_RANGE_REGEX.test(value.trim())) return false;
+  // Check each range segment for a-b where b >= a
+  const segments = value.trim().split(/,\s*/);
+  for (const seg of segments) {
+    if (seg.includes("-")) {
+      const [a, b] = seg.split("-").map(Number);
+      if (a < 1 || b < a) return false;
+    } else {
+      if (Number(seg) < 1) return false;
+    }
+  }
+  return true;
+};
 
 //----------------------------------- COMPONENTS -----------------------------------//
 
@@ -36,12 +55,15 @@ const PrintSettings = () => {
   const [pageRange, setPageRange] = useState("all");
   const [startPage, setStartPage] = useState("");
   const [endPage, setEndPage] = useState("");
+  const [advancedMode, setAdvancedMode] = useState(false);
+  const [advancedRange, setAdvancedRange] = useState("");
+  const [isAdvancedRangeValid, setIsAdvancedRangeValid] = useState(false);
 
   const [pagesPerSheet, setPagesPerSheet] = useState(1);
   const [showPagesPerSheetDropdown, setShowPagesPerSheetDropdown] = useState(false);
   const [numberOfCopies, setNumberOfCopies] = useState("1");
 
-  const { shopId, documents: documentsParam } = params;
+  const { shopId, documents: documentsParam, numberOfDocuments: numberOfDocumentsParam } = params;
 
   let parsedDocuments = [];
   try {
@@ -66,30 +88,77 @@ const PrintSettings = () => {
     }
     setStartPage("");
     setEndPage("");
+    setAdvancedMode(false);
+    setAdvancedRange("");
+    setIsAdvancedRangeValid(false);
+  };
+
+  const handleAdvancedRangeChange = (value) => {
+    setAdvancedRange(value);
+    setIsAdvancedRangeValid(isValidAdvancedRange(value));
+  };
+
+  const toggleAdvancedMode = () => {
+    setAdvancedMode((prev) => !prev);
+    setAdvancedRange("");
+    setIsAdvancedRangeValid(false);
+    setStartPage("");
+    setEndPage("");
+  };
+
+  // Determine if submit should be disabled
+  const isSubmitDisabled = () => {
+    if (loading) return true;
+    if (pageRange === "custom") {
+      if (advancedMode) return !isAdvancedRangeValid;
+      return !startPage || startPage.trim() === "";
+    }
+    return false;
+  };
+
+  // Build pageSelection string from current state
+  const getPageSelection = () => {
+    if (pageRange === "all") return "";
+    if (advancedMode) return advancedRange.trim();
+    // Simple mode: start page required, end page optional
+    const start = startPage.trim();
+    const end = endPage.trim();
+    if (end) return `${start}-${end}`;
+    return `${start}-`;
   };
 
   const validatePageRange = () => {
     if (pageRange === "custom") {
+      if (advancedMode) {
+        if (!isAdvancedRangeValid) {
+          Alert.alert("Invalid Range", "Please enter a valid page range (e.g. 1,3,16-20,25).");
+          return false;
+        }
+        return true;
+      }
+
       const start = parseInt(startPage);
-      const end = parseInt(endPage);
 
-      if (!startPage || !endPage) {
-        Alert.alert("Invalid Range", "Please enter both start and end page numbers.");
+      if (!startPage) {
+        Alert.alert("Invalid Range", "Please enter a start page number.");
         return false;
       }
 
-      if (isNaN(start) || isNaN(end)) {
-        Alert.alert("Invalid Range", "Please enter valid page numbers.");
-        return false;
-      }
-
-      if (start < 1) {
+      if (isNaN(start) || start < 1) {
         Alert.alert("Invalid Range", "Start page must be at least 1.");
         return false;
       }
-      if (start > end) {
-        Alert.alert("Invalid Range", "Start page cannot be greater than end page.");
-        return false;
+
+      if (endPage) {
+        const end = parseInt(endPage);
+        if (isNaN(end)) {
+          Alert.alert("Invalid Range", "Please enter a valid end page number.");
+          return false;
+        }
+        if (start > end) {
+          Alert.alert("Invalid Range", "Start page cannot be greater than end page.");
+          return false;
+        }
       }
     }
     return true;
@@ -130,38 +199,38 @@ const PrintSettings = () => {
       setLoading(true);
       setError(null);
 
-      const form = new FormData();
-      parsedDocuments.forEach((doc) => {
-        form.append("document", {
-          uri: doc.uri,
-          name: doc.name || "document.pdf",
-          type: doc.mimeType || "application/octet-stream",
-        });
-      });
-      form.append("shopId", shopId);
-      form.append("colorMode", colorMode);
-      form.append("orientation", orientation);
-      form.append("sidedness", sidedness);
-      form.append("pageSize", pageSize);
-      form.append("pageRange", pageRange);
-      form.append("pagesPerSheet", pagesPerSheet);
+      const pageSelection = getPageSelection();
+      const numDocs = parseInt(numberOfDocumentsParam) || parsedDocuments.length || 1;
 
-      if (pageRange === "custom") {
-        form.append("startPage", parseInt(startPage));
-        form.append("endPage", parseInt(endPage));
-      }
+      // Build files array with hardcoded hash for each document
+      const files = Array.from({ length: numDocs }, () => ({
+        hash: hardCodedHash,
+        settings: {
+          pageType: pageSize.toUpperCase(),
+          color: colorMode === "color",
+          pageSelection: pageSelection,
+          orientation: orientation,
+          sidedness: sidedness,
+          pagesPerSheet: pagesPerSheet,
+          numberOfCopies: copies,
+        },
+      }));
 
-      form.append("numberOfCopies", copies);
+      const body = {
+        forShop: shopId,
+        files: files,
+      };
 
       // LOG
-      console.log("Submitting print job with the following data:", form);
+      console.log("Submitting print job with the following data:", JSON.stringify(body, null, 2));
 
       const response = await fetch(`${API_BASE_URL}/newJob`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
         },
-        body: form,
+        body: JSON.stringify(body),
       });
 
       let data;
@@ -214,7 +283,7 @@ const PrintSettings = () => {
         <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent} keyboardShouldPersistTaps="handled">
           <View style={styles.summaryCard}>
             <View style={styles.summaryItem}>
-              <Text style={styles.summaryLabel}>Documents ({parsedDocuments.length})</Text>
+              <Text style={styles.summaryLabel}>Documents ({numberOfDocumentsParam})</Text>
               {parsedDocuments.map((doc, i) => (
                 <Text key={i} style={styles.summaryValue}>
                   {doc.name}
@@ -288,40 +357,64 @@ const PrintSettings = () => {
               </View>
             </View>
 
-            {/* Custom Page Range Inputs */}
+            {/* Advanced Range Toggle + Custom Inputs */}
             {pageRange === "custom" && (
               <View style={styles.customRangeContainer}>
-                <View style={styles.pageInputRow}>
-                  <View style={styles.pageInputGroup}>
-                    <Text style={styles.pageInputLabel}>Start Page</Text>
-                    <TextInput
-                      style={styles.pageInput}
-                      keyboardType="number-pad"
-                      placeholder="1"
-                      placeholderTextColor={colors.textSecondary}
-                      value={startPage}
-                      onChangeText={setStartPage}
-                      maxLength={4}
-                      returnKeyType="next"
-                    />
-                  </View>
+                {/* Advanced Range Toggle Button */}
+                <TouchableOpacity style={[styles.advancedToggleButton, advancedMode && styles.advancedToggleButtonActive]} onPress={toggleAdvancedMode}>
+                  <Feather name={advancedMode ? "list" : "edit-3"} size={16} color={advancedMode ? colors.cardBackground : colors.printRequest} />
+                  <Text style={[styles.advancedToggleText, advancedMode && styles.advancedToggleTextActive]}>{advancedMode ? "Simple Range" : "Advanced Range"}</Text>
+                </TouchableOpacity>
 
-                  <Text style={styles.pageRangeSeparator}>to</Text>
-
-                  <View style={styles.pageInputGroup}>
-                    <Text style={styles.pageInputLabel}>End Page</Text>
+                {advancedMode ? (
+                  /* Advanced Range Text Input */
+                  <View>
+                    <Text style={styles.pageInputLabel}>Page Range</Text>
                     <TextInput
-                      style={styles.pageInput}
-                      keyboardType="number-pad"
-                      placeholder="10"
+                      style={[styles.advancedRangeInput, advancedRange.length > 0 && (isAdvancedRangeValid ? styles.advancedRangeInputValid : styles.advancedRangeInputInvalid)]}
+                      placeholder="e.g. 1,3,16-20,25"
                       placeholderTextColor={colors.textSecondary}
-                      value={endPage}
-                      onChangeText={setEndPage}
-                      maxLength={4}
+                      value={advancedRange}
+                      onChangeText={handleAdvancedRangeChange}
+                      autoCapitalize="none"
                       returnKeyType="done"
                     />
+                    {advancedRange.length > 0 && !isAdvancedRangeValid && <Text style={styles.advancedRangeHint}>Use commas and dashes, e.g. 1,3,16-20,25</Text>}
                   </View>
-                </View>
+                ) : (
+                  /* Simple Start/End Page Inputs */
+                  <View style={styles.pageInputRow}>
+                    <View style={styles.pageInputGroup}>
+                      <Text style={styles.pageInputLabel}>Start Page *</Text>
+                      <TextInput
+                        style={styles.pageInput}
+                        keyboardType="number-pad"
+                        placeholder="1"
+                        placeholderTextColor={colors.textSecondary}
+                        value={startPage}
+                        onChangeText={setStartPage}
+                        maxLength={4}
+                        returnKeyType="next"
+                      />
+                    </View>
+
+                    <Text style={styles.pageRangeSeparator}>to</Text>
+
+                    <View style={styles.pageInputGroup}>
+                      <Text style={styles.pageInputLabel}>End Page (optional)</Text>
+                      <TextInput
+                        style={styles.pageInput}
+                        keyboardType="number-pad"
+                        placeholder="End"
+                        placeholderTextColor={colors.textSecondary}
+                        value={endPage}
+                        onChangeText={setEndPage}
+                        maxLength={4}
+                        returnKeyType="done"
+                      />
+                    </View>
+                  </View>
+                )}
               </View>
             )}
 
@@ -380,7 +473,7 @@ const PrintSettings = () => {
         </ScrollView>
 
         <View style={styles.footer}>
-          <TouchableOpacity style={[styles.submitButton, loading && styles.submitButtonDisabled]} onPress={handleSubmit} disabled={loading}>
+          <TouchableOpacity style={[styles.submitButton, isSubmitDisabled() && styles.submitButtonDisabled]} onPress={handleSubmit} disabled={isSubmitDisabled()}>
             {loading ? (
               <ActivityIndicator size="small" color={colors.cardBackground} />
             ) : (
@@ -526,6 +619,54 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     borderWidth: 1,
     borderColor: colors.borderLight,
+  },
+  advancedToggleButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    borderWidth: 1.5,
+    borderColor: colors.printRequest,
+    backgroundColor: colors.cardBackground,
+    marginBottom: 16,
+    gap: 8,
+  },
+  advancedToggleButtonActive: {
+    backgroundColor: colors.printRequest,
+    borderColor: colors.printRequest,
+  },
+  advancedToggleText: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: colors.printRequest,
+  },
+  advancedToggleTextActive: {
+    color: colors.cardBackground,
+  },
+  advancedRangeInput: {
+    borderWidth: 2,
+    borderColor: colors.borderLight,
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    fontSize: 16,
+    fontWeight: "600",
+    color: colors.textPrimary,
+    backgroundColor: colors.cardBackground,
+  },
+  advancedRangeInputValid: {
+    borderColor: "#2ECC71",
+  },
+  advancedRangeInputInvalid: {
+    borderColor: "#E74C3C",
+  },
+  advancedRangeHint: {
+    fontSize: 11,
+    color: "#E74C3C",
+    marginTop: 6,
+    fontWeight: "500",
   },
   pageInputRow: {
     flexDirection: "row",
