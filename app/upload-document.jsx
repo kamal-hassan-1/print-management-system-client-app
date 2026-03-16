@@ -121,15 +121,15 @@ const UploadDocument = () => {
       },
       body: formData,
     });
-    const data = await response.json();
-    console.log(fileName, " : ", data);
+    const body = await response.json();
+    console.log(fileName, " : ", body);
     if (response.status === 201) {
-      console.log("Document uploaded successfully named ", fileName, " with id ", data.fileId);
-      return data.fileId;
+      console.log("Document uploaded successfully named ", fileName, " with id ", body.data.fileId);
+      return body.data.fileId;
     } else {
-      console.log("error in uploading document named ", fileName, ":", data.message);
-      setError(data.message);
-      throw new Error(data.message || "Upload failed");
+      console.log("error in uploading document named ", fileName, ":", body.message);
+      setError(body.message);
+      throw new Error(body.message || "Upload failed");
     }
   };
 
