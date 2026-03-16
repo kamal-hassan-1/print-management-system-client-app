@@ -446,6 +446,4 @@ const styles = StyleSheet.create({
   },
 });
 
-//----------------------------------- EXPORT -----------------------------------//
-
 export default UploadDocument;
