@@ -28,11 +28,11 @@ const UploadDocument = () => {
   const shopName = params.shopName;
 
   useEffect(() => {
-    if (!shopId) {
-      Alert.alert("Error", "Shop ID not found. Please go back and select a shop.");
+    if (!shopId || !shopName) {
+      Alert.alert("Error", "Shop information not found. Please go back and select a shop.");
       router.back();
     }
-  }, [router, shopId]);
+  }, [router, shopId, shopName]);
 
   const handleDocumentPick = async () => {
     try {
@@ -58,7 +58,7 @@ const UploadDocument = () => {
       if (!result.canceled) {
         const newDocs = result.assets.map((file) => ({
           file,
-          name: file.name ? file.name.replace(/\.[^/.]+$/, "") : "Document",
+          name: file.name ? file.name.replace(/\.[^/.]+$/, "") || "Document" : "Document",
         }));
         setDocuments((prev) => [...prev, ...newDocs]);
         setError(null);
@@ -84,7 +84,9 @@ const UploadDocument = () => {
 
   const handleContinue = async () => {
     setLoading(true);
+    setError(null);
     const fileIds = [];
+    const failedDocs = [];
     const token = await SecureStore.getItemAsync("authToken");
     try {
       for (const doc of documents) {
@@ -97,13 +99,15 @@ const UploadDocument = () => {
         const fileId = await uploadDocument(formData, doc.file.name, token);
         if (fileId) {
           fileIds.push(fileId);
+        } else {
+          failedDocs.push(doc.file.name);
         }
       }
-      if (fileIds.length === documents.length) {
+      if (failedDocs.length === 0) {
         setDocuments([]);
-        router.push({ pathname: "/print-settings", params: { shopId, documents: fileIds, numberOfDocuments: fileIds.length } });
+        router.push({ pathname: "/print-settings", params: { shopId, documents: JSON.stringify(fileIds), numberOfDocuments: fileIds.length } });
       } else {
-        setError("Some documents failed to upload. Please try again.");
+        setError(`${failedDocs.length} document(s) failed to upload: ${failedDocs.join(", ")}. Please try again.`);
       }
     } catch (err) {
       console.error("Error uploading documents:", err);
@@ -114,22 +118,26 @@ const UploadDocument = () => {
   };
 
   const uploadDocument = async (formData, fileName, token) => {
-    const response = await fetch(`${API_BASE_URL}/files`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      body: formData,
-    });
-    const body = await response.json();
-    console.log(fileName, " : ", body);
-    if (response.status === 201) {
-      console.log("Document uploaded successfully named ", fileName, " with id ", body.data.fileId);
-      return body.data.fileId;
-    } else {
-      console.log("error in uploading document named ", fileName, ":", body.message);
-      setError(body.message);
-      throw new Error(body.message || "Upload failed");
+    try {
+      const response = await fetch(`${API_BASE_URL}/files`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+      const body = await response.json();
+      console.log(fileName, " : ", body);
+      if (response.status === 201) {
+        console.log("Document uploaded successfully named ", fileName, " with id ", body.data.fileId);
+        return body.data.fileId;
+      } else {
+        console.log("error in uploading document named ", fileName, ":", body.message);
+        return null;
+      }
+    } catch (err) {
+      console.error("Network error uploading ", fileName, ":", err);
+      return null;
     }
   };
 
@@ -219,9 +227,9 @@ const UploadDocument = () => {
       </ScrollView>
       <View style={styles.footer}>
         <TouchableOpacity
-          style={[styles.continueButton, (!hasDocuments || !allNamesValid) && styles.continueButtonDisabled]}
+          style={[styles.continueButton, (!hasDocuments || !allNamesValid || loading) && styles.continueButtonDisabled]}
           onPress={handleContinue}
-          disabled={!hasDocuments || !allNamesValid}
+          disabled={!hasDocuments || !allNamesValid || loading}
         >
           <Text style={styles.continueButtonText}>Continue</Text>
           <Feather name="arrow-right" size={20} color={colors.cardBackground} />
@@ -437,4 +445,7 @@ const styles = StyleSheet.create({
     color: colors.printRequest,
   },
 });
+
+//----------------------------------- EXPORT -----------------------------------//
+
 export default UploadDocument;
