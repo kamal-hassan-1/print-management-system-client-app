@@ -134,14 +134,8 @@ const VerifyCode = () => {
 
 	return (
 		<SafeAreaView style={styles.container}>
-			<TouchableOpacity
-				style={styles.backButton}
-				onPress={() => router.back()}>
-				<Ionicons
-					name="arrow-back"
-					size={24}
-					color="#fff"
-				/>
+			<TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
+				<Ionicons name="arrow-back" size={24} color="#fff" />
 			</TouchableOpacity>
 
 			<Text style={styles.title}>Enter verification code</Text>
@@ -149,11 +143,7 @@ const VerifyCode = () => {
 			<View style={styles.instructionContainer}>
 				<Text style={styles.instructionText}>We&apos;ve sent it to +{phoneNumber} via</Text>
 				<View style={styles.whatsappContainer}>
-					<Ionicons
-						name="logo-whatsapp"
-						size={18}
-						color="#25D366"
-					/>
+					<Ionicons name="logo-whatsapp" size={18} color="#25D366" />
 					<Text style={styles.whatsappText}>Whatsapp</Text>
 				</View>
 			</View>
@@ -180,15 +170,9 @@ const VerifyCode = () => {
 					<Text style={styles.timerText}>Resend available in {formatTimer(timer)}</Text>
 				) : (
 					<View style={styles.actionContainer}>
-						<TouchableOpacity
-							onPress={handleResendCode}
-							style={styles.resendButton}
-							disabled={resending}>
+						<TouchableOpacity onPress={handleResendCode} style={styles.resendButton} disabled={resending}>
 							{resending ? (
-								<ActivityIndicator
-									color={colors.textPrimary}
-									size="small"
-								/>
+								<ActivityIndicator color={colors.textPrimary} size="small" />
 							) : (
 								<Text style={styles.resendText}>Resend code</Text>
 							)}
@@ -197,36 +181,20 @@ const VerifyCode = () => {
 				)}
 			</View>
 
-			<Modal
-				visible={showErrorModal}
-				transparent={true}
-				animationType="slide"
-				onRequestClose={() => setShowErrorModal(false)}>
+			<Modal visible={showErrorModal} transparent={true} animationType="slide" onRequestClose={() => setShowErrorModal(false)}>
 				<View style={styles.errorModalOverlay}>
 					<View style={styles.errorModalContent}>
 						<Text style={styles.errorModalTitle}>Oops</Text>
 						<Text style={styles.errorModalMessage}>Something went wrong. Please try again.</Text>
 
-						<TouchableOpacity
-							style={styles.errorCancelButton}
-							onPress={() => setShowErrorModal(false)}>
+						<TouchableOpacity style={styles.errorCancelButton} onPress={() => setShowErrorModal(false)}>
 							<Text style={styles.errorCancelText}>Cancel</Text>
-							<Ionicons
-								name="close"
-								size={20}
-								color="#FF4F00"
-							/>
+							<Ionicons name="close" size={20} color="#FF4F00" />
 						</TouchableOpacity>
 
-						<TouchableOpacity
-							style={styles.errorTryAgainButton}
-							onPress={handleClearAndRetry}>
+						<TouchableOpacity style={styles.errorTryAgainButton} onPress={handleClearAndRetry}>
 							<Text style={styles.errorTryAgainText}>Try again</Text>
-							<Ionicons
-								name="arrow-forward"
-								size={20}
-								color="#fff"
-							/>
+							<Ionicons name="arrow-forward" size={20} color="#fff" />
 						</TouchableOpacity>
 					</View>
 				</View>

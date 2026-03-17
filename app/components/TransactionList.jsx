@@ -13,9 +13,7 @@ const TransactionList = ({ transactions, limit = null, onTransactionPress }) => 
 				const { transactions: dailyTransactions } = groupedTransactions[date];
 				const isFirstDate = index === 0;
 				return (
-					<View
-						key={date}
-						style={styles.dateSection}>
+					<View key={date} style={styles.dateSection}>
 						<View style={styles.dateHeader}>
 							<Text style={isFirstDate ? styles.dateText : styles.dateTextSecondary}>{formatDate(date)}</Text>
 						</View>

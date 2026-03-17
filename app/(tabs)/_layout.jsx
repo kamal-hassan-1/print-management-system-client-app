@@ -37,20 +37,15 @@ export default function Layout() {
 				tabBarIconStyle: {
 					marginBottom: -4,
 				},
-			}}>
+			}}
+		>
 			{/* Home Tab */}
 
 			<Tabs.Screen
 				name="home"
 				options={{
 					title: "Home",
-					tabBarIcon: ({ color, focused }) => (
-						<Ionicons
-							name={focused ? "home" : "home-outline"}
-							size={20}
-							color={color}
-						/>
-					),
+					tabBarIcon: ({ color, focused }) => <Ionicons name={focused ? "home" : "home-outline"} size={20} color={color} />,
 				}}
 			/>
 
@@ -60,13 +55,7 @@ export default function Layout() {
 				name="printHistory"
 				options={{
 					title: "Print History",
-					tabBarIcon: ({ color, focused }) => (
-						<Ionicons
-							name={focused ? "receipt" : "receipt-outline"}
-							size={20}
-							color={color}
-						/>
-					),
+					tabBarIcon: ({ color, focused }) => <Ionicons name={focused ? "receipt" : "receipt-outline"} size={20} color={color} />,
 				}}
 			/>
 
@@ -76,13 +65,7 @@ export default function Layout() {
 				name="profile"
 				options={{
 					title: "Profile",
-					tabBarIcon: ({ color, focused }) => (
-						<Ionicons
-							name={focused ? "person" : "person-outline"}
-							size={20}
-							color={color}
-						/>
-					),
+					tabBarIcon: ({ color, focused }) => <Ionicons name={focused ? "person" : "person-outline"} size={20} color={color} />,
 				}}
 			/>
 		</Tabs>

@@ -4,17 +4,11 @@ import { colors } from "../../constants/colors";
 
 const TransactionItem = ({ transaction, onPress }) => {
 	return (
-		<TouchableOpacity
-			style={styles.transactionCard}
-			onPress={onPress}>
+		<TouchableOpacity style={styles.transactionCard} onPress={onPress}>
 			<View style={styles.transactionLeft}>
 				{/*----------------- Print Icon -------------------- */}
 				<View style={styles.transactionIcon}>
-					<Feather
-						name="file-text"
-						size={18}
-						color={colors.textSecondary}
-					/>
+					<Feather name="file-text" size={18} color={colors.textSecondary} />
 				</View>
 
 				{/*----------------- Transaction Info (Name, Time, Pages, Print Size) -------------------- */}

@@ -9,7 +9,8 @@ const SettingRow = ({ label, options, selectedValue, onSelect }) => (
 				<TouchableOpacity
 					key={option.value}
 					style={[styles.optionButton, selectedValue === option.value && styles.optionButtonActive]}
-					onPress={() => onSelect(option.value)}>
+					onPress={() => onSelect(option.value)}
+				>
 					<Text style={[styles.optionButtonText, selectedValue === option.value && styles.optionButtonTextActive]}>{option.label}</Text>
 				</TouchableOpacity>
 			))}

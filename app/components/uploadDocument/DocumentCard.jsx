@@ -9,29 +9,17 @@ const DocumentCard = ({ doc, index, onRemove }) => {
 		<View style={styles.documentCard}>
 			<View style={styles.documentCardHeader}>
 				<View style={styles.documentIconContainer}>
-					<Feather
-						name="file-text"
-						size={22}
-						color={colors.primary}
-					/>
+					<Feather name="file-text" size={22} color={colors.primary} />
 					<Text style={styles.extensionBadge}>{extension}</Text>
 				</View>
 				<View style={styles.documentInfo}>
-					<Text
-						style={styles.documentOriginalName}
-						numberOfLines={1}>
+					<Text style={styles.documentOriginalName} numberOfLines={1}>
 						{doc.file.name.slice(0, 40)}
 					</Text>
 					<Text style={styles.documentFileSize}>{(doc.file.size / 1024).toFixed(2)} KB</Text>
 				</View>
-				<TouchableOpacity
-					style={styles.removeCardButton}
-					onPress={() => onRemove(index)}>
-					<Feather
-						name="x"
-						size={18}
-						color={colors.printRequest}
-					/>
+				<TouchableOpacity style={styles.removeCardButton} onPress={() => onRemove(index)}>
+					<Feather name="x" size={18} color={colors.printRequest} />
 				</TouchableOpacity>
 			</View>
 		</View>

@@ -115,33 +115,24 @@ const Login = () => {
 	//----------------------------------- RENDER -----------------------------------//
 
 	return (
-		<KeyboardAvoidingView
-			style={{ flex: 1 }}
-			behavior={Platform.OS === "ios" ? "padding" : "height"}>
+		<KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === "ios" ? "padding" : "height"}>
 			<TouchableWithoutFeedback
 				onPress={() => {
 					Keyboard.dismiss();
 					setShowPicker(false);
 				}}
-				accessible={false}>
-				<SafeAreaView
-					style={styles.container}
-					onLayout={onLayoutRootView}>
+				accessible={false}
+			>
+				<SafeAreaView style={styles.container} onLayout={onLayoutRootView}>
 					<Text style={styles.heading}>Let&apos;s get started!</Text>
 					<Text style={styles.subHeading}>Please enter your mobile number</Text>
 
 					<View style={styles.phoneRow}>
 						{/* Country Code */}
 						<View style={styles.countryCodeWrapper}>
-							<TouchableOpacity
-								style={styles.countryBox}
-								onPress={() => setShowPicker(!showPicker)}>
+							<TouchableOpacity style={styles.countryBox} onPress={() => setShowPicker(!showPicker)}>
 								<Text style={styles.countryCodeText}>{getSelectedCountryDisplay()}</Text>
-								<Ionicons
-									name={showPicker ? "chevron-up" : "chevron-down"}
-									size={18}
-									color="#000"
-								/>
+								<Ionicons name={showPicker ? "chevron-up" : "chevron-down"} size={18} color="#000" />
 							</TouchableOpacity>
 
 							{/* Dropdown */}
@@ -151,15 +142,17 @@ const Login = () => {
 										<TouchableOpacity
 											key={item.value}
 											style={[styles.dropdownOption, countryCode === item.value && styles.dropdownOptionSelected]}
-											onPress={() => selectCountryCode(item.value)}>
-											<Text style={[styles.dropdownOptionText, countryCode === item.value && styles.dropdownOptionTextSelected]}>{item.label}</Text>
-											{countryCode === item.value && (
-												<Ionicons
-													name="checkmark"
-													size={18}
-													color="#FF4F00"
-												/>
-											)}
+											onPress={() => selectCountryCode(item.value)}
+										>
+											<Text
+												style={[
+													styles.dropdownOptionText,
+													countryCode === item.value && styles.dropdownOptionTextSelected,
+												]}
+											>
+												{item.label}
+											</Text>
+											{countryCode === item.value && <Ionicons name="checkmark" size={18} color="#FF4F00" />}
 										</TouchableOpacity>
 									))}
 								</View>
@@ -183,17 +176,14 @@ const Login = () => {
 					<TouchableOpacity
 						style={[styles.button, (!isValidPhone || loading) && styles.buttonDisabled]}
 						disabled={!isValidPhone || loading}
-						onPress={handleContinue}>
+						onPress={handleContinue}
+					>
 						{loading ? (
 							<ActivityIndicator color="#fff" />
 						) : (
 							<>
 								<Text style={styles.buttonText}>Continue</Text>
-								<Ionicons
-									name="arrow-forward"
-									size={19}
-									color={"#fff"}
-								/>
+								<Ionicons name="arrow-forward" size={19} color={"#fff"} />
 							</>
 						)}
 					</TouchableOpacity>

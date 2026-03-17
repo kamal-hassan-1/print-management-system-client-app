@@ -78,21 +78,13 @@ const PrintHistory = () => {
 
 	if (loading) {
 		return (
-			<SafeAreaView
-				style={styles.container}
-				edges={["top"]}>
-				<StatusBar
-					barStyle="dark-content"
-					backgroundColor={colors.background}
-				/>
+			<SafeAreaView style={styles.container} edges={["top"]}>
+				<StatusBar barStyle="dark-content" backgroundColor={colors.background} />
 				<View style={styles.header}>
 					<Text style={styles.headerTitle}>Print History</Text>
 				</View>
 				<View style={styles.loadingContainer}>
-					<ActivityIndicator
-						size="large"
-						color={colors.primary}
-					/>
+					<ActivityIndicator size="large" color={colors.primary} />
 					<Text style={styles.loadingText}>Loading transactions...</Text>
 				</View>
 			</SafeAreaView>
@@ -101,26 +93,15 @@ const PrintHistory = () => {
 
 	if (error) {
 		return (
-			<SafeAreaView
-				style={styles.container}
-				edges={["top"]}>
-				<StatusBar
-					barStyle="dark-content"
-					backgroundColor={colors.background}
-				/>
+			<SafeAreaView style={styles.container} edges={["top"]}>
+				<StatusBar barStyle="dark-content" backgroundColor={colors.background} />
 				<View style={styles.header}>
 					<Text style={styles.headerTitle}>Print History</Text>
 				</View>
 				<View style={styles.errorContainer}>
-					<Feather
-						name="alert-circle"
-						size={48}
-						color={colors.expense}
-					/>
+					<Feather name="alert-circle" size={48} color={colors.expense} />
 					<Text style={styles.errorText}>{error}</Text>
-					<TouchableOpacity
-						style={styles.retryButton}
-						onPress={refresh}>
+					<TouchableOpacity style={styles.retryButton} onPress={refresh}>
 						<Text style={styles.retryButtonText}>Retry</Text>
 					</TouchableOpacity>
 				</View>
@@ -129,13 +110,8 @@ const PrintHistory = () => {
 	}
 
 	return (
-		<SafeAreaView
-			style={styles.container}
-			edges={["top"]}>
-			<StatusBar
-				barStyle="dark-content"
-				backgroundColor={colors.background}
-			/>
+		<SafeAreaView style={styles.container} edges={["top"]}>
+			<StatusBar barStyle="dark-content" backgroundColor={colors.background} />
 
 			<View style={styles.header}>
 				<Text style={styles.headerTitle}>Print History</Text>
@@ -144,14 +120,8 @@ const PrintHistory = () => {
 			{/* Filter and Sort Bar */}
 
 			<View style={styles.filterBar}>
-				<TouchableOpacity
-					style={styles.filterButton}
-					onPress={() => setFilterModalVisible(true)}>
-					<Feather
-						name="filter"
-						size={18}
-						color={colors.textPrimary}
-					/>
+				<TouchableOpacity style={styles.filterButton} onPress={() => setFilterModalVisible(true)}>
+					<Feather name="filter" size={18} color={colors.textPrimary} />
 					<Text style={styles.filterButtonText}>Filter</Text>
 					{activeFiltersCount() > 0 && (
 						<View style={styles.filterBadge}>
@@ -160,21 +130,13 @@ const PrintHistory = () => {
 					)}
 				</TouchableOpacity>
 
-				<TouchableOpacity
-					style={styles.filterButton}
-					onPress={() => setSortModalVisible(true)}>
-					<Feather
-						name="arrow-up-right"
-						size={18}
-						color={colors.textPrimary}
-					/>
+				<TouchableOpacity style={styles.filterButton} onPress={() => setSortModalVisible(true)}>
+					<Feather name="arrow-up-right" size={18} color={colors.textPrimary} />
 					<Text style={styles.filterButtonText}>Sort</Text>
 				</TouchableOpacity>
 
 				{activeFiltersCount() > 0 && (
-					<TouchableOpacity
-						style={styles.clearButton}
-						onPress={clearFilters}>
+					<TouchableOpacity style={styles.clearButton} onPress={clearFilters}>
 						<Text style={styles.clearButtonText}>Clear</Text>
 					</TouchableOpacity>
 				)}
@@ -186,21 +148,11 @@ const PrintHistory = () => {
 				style={styles.scrollView}
 				contentContainerStyle={styles.scrollContent}
 				showsVerticalScrollIndicator={false}
-				refreshControl={
-					<RefreshControl
-						refreshing={refreshing}
-						onRefresh={refresh}
-						colors={[colors.primary]}
-						tintColor={colors.primary}
-					/>
-				}>
+				refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} colors={[colors.primary]} tintColor={colors.primary} />}
+			>
 				{filteredAndSortedTransactions.length === 0 ? (
 					<View style={styles.emptyContainer}>
-						<Feather
-							name="inbox"
-							size={48}
-							color={colors.textSecondary}
-						/>
+						<Feather name="inbox" size={48} color={colors.textSecondary} />
 						<Text style={styles.emptyText}>No transactions found</Text>
 					</View>
 				) : (
@@ -210,21 +162,13 @@ const PrintHistory = () => {
 
 			{/* Filter Modal */}
 
-			<Modal
-				visible={filterModalVisible}
-				animationType="slide"
-				transparent={true}
-				onRequestClose={() => setFilterModalVisible(false)}>
+			<Modal visible={filterModalVisible} animationType="slide" transparent={true} onRequestClose={() => setFilterModalVisible(false)}>
 				<View style={styles.modalOverlay}>
 					<View style={styles.modalContent}>
 						<View style={styles.modalHeader}>
 							<Text style={styles.modalTitle}>Filter Transactions</Text>
 							<TouchableOpacity onPress={() => setFilterModalVisible(false)}>
-								<Feather
-									name="x"
-									size={24}
-									color={colors.textPrimary}
-								/>
+								<Feather name="x" size={24} color={colors.textPrimary} />
 							</TouchableOpacity>
 						</View>
 
@@ -258,9 +202,7 @@ const PrintHistory = () => {
 
 						{/* Apply Button */}
 
-						<TouchableOpacity
-							style={styles.applyButton}
-							onPress={() => setFilterModalVisible(false)}>
+						<TouchableOpacity style={styles.applyButton} onPress={() => setFilterModalVisible(false)}>
 							<Text style={styles.applyButtonText}>Apply Filters</Text>
 						</TouchableOpacity>
 					</View>
@@ -269,21 +211,13 @@ const PrintHistory = () => {
 
 			{/* Sort Modal */}
 
-			<Modal
-				visible={sortModalVisible}
-				animationType="slide"
-				transparent={true}
-				onRequestClose={() => setSortModalVisible(false)}>
+			<Modal visible={sortModalVisible} animationType="slide" transparent={true} onRequestClose={() => setSortModalVisible(false)}>
 				<View style={styles.modalOverlay}>
 					<View style={styles.modalContent}>
 						<View style={styles.modalHeader}>
 							<Text style={styles.modalTitle}>Sort By</Text>
 							<TouchableOpacity onPress={() => setSortModalVisible(false)}>
-								<Feather
-									name="x"
-									size={24}
-									color={colors.textPrimary}
-								/>
+								<Feather name="x" size={24} color={colors.textPrimary} />
 							</TouchableOpacity>
 						</View>
 
@@ -297,22 +231,13 @@ const PrintHistory = () => {
 									setSortBy("date");
 									setSortOrder("desc");
 								}
-							}}>
+							}}
+						>
 							<View style={styles.sortOptionLeft}>
-								<Feather
-									name="calendar"
-									size={20}
-									color={colors.textPrimary}
-								/>
+								<Feather name="calendar" size={20} color={colors.textPrimary} />
 								<Text style={styles.sortOptionText}>Date & Time</Text>
 							</View>
-							{sortBy === "date" && (
-								<Feather
-									name={sortOrder === "desc" ? "arrow-down" : "arrow-up"}
-									size={20}
-									color={colors.primary}
-								/>
-							)}
+							{sortBy === "date" && <Feather name={sortOrder === "desc" ? "arrow-down" : "arrow-up"} size={20} color={colors.primary} />}
 						</TouchableOpacity>
 
 						<TouchableOpacity
@@ -324,22 +249,13 @@ const PrintHistory = () => {
 									setSortBy("price");
 									setSortOrder("desc");
 								}
-							}}>
+							}}
+						>
 							<View style={styles.sortOptionLeft}>
-								<Feather
-									name="dollar-sign"
-									size={20}
-									color={colors.textPrimary}
-								/>
+								<Feather name="dollar-sign" size={20} color={colors.textPrimary} />
 								<Text style={styles.sortOptionText}>Price</Text>
 							</View>
-							{sortBy === "price" && (
-								<Feather
-									name={sortOrder === "desc" ? "arrow-down" : "arrow-up"}
-									size={20}
-									color={colors.primary}
-								/>
-							)}
+							{sortBy === "price" && <Feather name={sortOrder === "desc" ? "arrow-down" : "arrow-up"} size={20} color={colors.primary} />}
 						</TouchableOpacity>
 
 						<TouchableOpacity
@@ -351,29 +267,20 @@ const PrintHistory = () => {
 									setSortBy("printSize");
 									setSortOrder("desc");
 								}
-							}}>
+							}}
+						>
 							<View style={styles.sortOptionLeft}>
-								<Feather
-									name="file"
-									size={20}
-									color={colors.textPrimary}
-								/>
+								<Feather name="file" size={20} color={colors.textPrimary} />
 								<Text style={styles.sortOptionText}>Print Size</Text>
 							</View>
 							{sortBy === "printSize" && (
-								<Feather
-									name={sortOrder === "desc" ? "arrow-down" : "arrow-up"}
-									size={20}
-									color={colors.primary}
-								/>
+								<Feather name={sortOrder === "desc" ? "arrow-down" : "arrow-up"} size={20} color={colors.primary} />
 							)}
 						</TouchableOpacity>
 
 						{/* Apply Button */}
 
-						<TouchableOpacity
-							style={styles.applyButton}
-							onPress={() => setSortModalVisible(false)}>
+						<TouchableOpacity style={styles.applyButton} onPress={() => setSortModalVisible(false)}>
 							<Text style={styles.applyButtonText}>Apply</Text>
 						</TouchableOpacity>
 					</View>

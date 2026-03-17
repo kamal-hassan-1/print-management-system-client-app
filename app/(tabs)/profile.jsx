@@ -54,24 +54,13 @@ const Profile = () => {
 	//----------------------------------- STYLES -----------------------------------//
 
 	return (
-		<SafeAreaView
-			style={styles.container}
-			edges={["top"]}>
-			<StatusBar
-				barStyle="dark-content"
-				backgroundColor={colors.background}
-			/>
+		<SafeAreaView style={styles.container} edges={["top"]}>
+			<StatusBar barStyle="dark-content" backgroundColor={colors.background} />
 
-			<ScrollView
-				style={styles.scrollView}
-				contentContainerStyle={styles.scrollContent}
-				showsVerticalScrollIndicator={false}>
+			<ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
 				{/* Profile Header */}
 				<View style={styles.profileHeader}>
-					<Image
-						source={avatar}
-						style={styles.avatarContainer}
-					/>
+					<Image source={avatar} style={styles.avatarContainer} />
 					<Text style={styles.userName}>{userName}</Text>
 				</View>
 
@@ -83,20 +72,13 @@ const Profile = () => {
 						style={styles.menuItem}
 						onPress={() => {
 							Alert.alert("Funtionality to be added soon!");
-						}}>
+						}}
+					>
 						<View style={styles.menuItemLeft}>
-							<Feather
-								name="user"
-								size={20}
-								color={colors.textPrimary}
-							/>
+							<Feather name="user" size={20} color={colors.textPrimary} />
 							<Text style={styles.menuItemText}>Edit Profile</Text>
 						</View>
-						<Feather
-							name="chevron-right"
-							size={20}
-							color={colors.textSecondary}
-						/>
+						<Feather name="chevron-right" size={20} color={colors.textSecondary} />
 					</TouchableOpacity>
 				</View>
 
@@ -107,40 +89,26 @@ const Profile = () => {
 						style={styles.menuItem}
 						onPress={() => {
 							Alert.alert("Funtionality to be added soon!");
-						}}>
+						}}
+					>
 						<View style={styles.menuItemLeft}>
-							<Feather
-								name="bell"
-								size={20}
-								color={colors.textPrimary}
-							/>
+							<Feather name="bell" size={20} color={colors.textPrimary} />
 							<Text style={styles.menuItemText}>Notifications</Text>
 						</View>
-						<Feather
-							name="chevron-right"
-							size={20}
-							color={colors.textSecondary}
-						/>
+						<Feather name="chevron-right" size={20} color={colors.textSecondary} />
 					</TouchableOpacity>
 
 					<TouchableOpacity
 						style={styles.menuItem}
 						onPress={() => {
 							Alert.alert("Funtionality to be added soon!");
-						}}>
+						}}
+					>
 						<View style={styles.menuItemLeft}>
-							<Feather
-								name="settings"
-								size={20}
-								color={colors.textPrimary}
-							/>
+							<Feather name="settings" size={20} color={colors.textPrimary} />
 							<Text style={styles.menuItemText}>Settings</Text>
 						</View>
-						<Feather
-							name="chevron-right"
-							size={20}
-							color={colors.textSecondary}
-						/>
+						<Feather name="chevron-right" size={20} color={colors.textSecondary} />
 					</TouchableOpacity>
 				</View>
 
@@ -151,52 +119,32 @@ const Profile = () => {
 						style={styles.menuItem}
 						onPress={() => {
 							Alert.alert("Funtionality to be added soon!");
-						}}>
+						}}
+					>
 						<View style={styles.menuItemLeft}>
-							<Feather
-								name="help-circle"
-								size={20}
-								color={colors.textPrimary}
-							/>
+							<Feather name="help-circle" size={20} color={colors.textPrimary} />
 							<Text style={styles.menuItemText}>About</Text>
 						</View>
-						<Feather
-							name="chevron-right"
-							size={20}
-							color={colors.textSecondary}
-						/>
+						<Feather name="chevron-right" size={20} color={colors.textSecondary} />
 					</TouchableOpacity>
 
 					<TouchableOpacity
 						style={styles.menuItem}
 						onPress={() => {
 							Alert.alert("Funtionality to be added soon!");
-						}}>
+						}}
+					>
 						<View style={styles.menuItemLeft}>
-							<Feather
-								name="mail"
-								size={20}
-								color={colors.textPrimary}
-							/>
+							<Feather name="mail" size={20} color={colors.textPrimary} />
 							<Text style={styles.menuItemText}>Contact Support</Text>
 						</View>
-						<Feather
-							name="chevron-right"
-							size={20}
-							color={colors.textSecondary}
-						/>
+						<Feather name="chevron-right" size={20} color={colors.textSecondary} />
 					</TouchableOpacity>
 				</View>
 
 				{/* Logout Button */}
-				<TouchableOpacity
-					style={styles.logoutButton}
-					onPress={handleLogout}>
-					<Feather
-						name="log-out"
-						size={20}
-						color={colors.cardBackground}
-					/>
+				<TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+					<Feather name="log-out" size={20} color={colors.cardBackground} />
 					<Text style={styles.logoutButtonText}>Logout</Text>
 				</TouchableOpacity>
 			</ScrollView>

@@ -130,9 +130,7 @@ const ProfileSetup = () => {
 
 	return (
 		<SafeAreaView style={styles.container}>
-			<KeyboardAvoidingView
-				behavior={Platform.OS === "ios" ? "padding" : "height"}
-				style={styles.flexContainer}>
+			<KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.flexContainer}>
 				<Animated.View
 					style={[
 						styles.content,
@@ -140,17 +138,14 @@ const ProfileSetup = () => {
 							opacity: opacityAnim,
 							transform: [{ scale: scaleAnim }, { translateY: slideAnim }],
 						},
-					]}>
+					]}
+				>
 					{!success ? (
 						<>
 							{/* Header Section */}
 							<View style={styles.headerSection}>
 								<View style={styles.avatarPlaceholder}>
-									<MaterialCommunityIcons
-										name="account-circle"
-										size={80}
-										color={colors.primary}
-									/>
+									<MaterialCommunityIcons name="account-circle" size={80} color={colors.primary} />
 								</View>
 
 								<Text style={styles.title}>Let&apos;s get started</Text>
@@ -192,11 +187,13 @@ const ProfileSetup = () => {
 							<Animated.View
 								style={{
 									transform: [{ scale: buttonScaleAnim }],
-								}}>
+								}}
+							>
 								<TouchableOpacity
 									style={[styles.submitButton, loading && styles.submitButtonLoading]}
 									onPress={handleSubmit}
-									disabled={loading}>
+									disabled={loading}
+								>
 									{loading ? (
 										<View style={styles.loadingContainer}>
 											<Text style={styles.submitButtonText}>Saving...</Text>
@@ -231,12 +228,9 @@ const ProfileSetup = () => {
 											}),
 										},
 									],
-								}}>
-								<MaterialCommunityIcons
-									name="check-circle"
-									size={100}
-									color={colors.primary}
-								/>
+								}}
+							>
+								<MaterialCommunityIcons name="check-circle" size={100} color={colors.primary} />
 							</Animated.View>
 							<Text style={styles.successTitle}>Welcome, {userName}!</Text>
 							<Text style={styles.successSubtitle}>Profile setup complete</Text>

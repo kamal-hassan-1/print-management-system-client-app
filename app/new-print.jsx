@@ -70,22 +70,11 @@ const NewPrint = () => {
 	//----------------------------------- RENDER -----------------------------------//
 
 	return (
-		<SafeAreaView
-			style={styles.container}
-			edges={["top"]}>
-			<StatusBar
-				barStyle="dark-content"
-				backgroundColor={colors.background}
-			/>
+		<SafeAreaView style={styles.container} edges={["top"]}>
+			<StatusBar barStyle="dark-content" backgroundColor={colors.background} />
 			<View style={styles.header}>
-				<TouchableOpacity
-					onPress={() => router.back()}
-					style={styles.backButton}>
-					<Feather
-						name="arrow-left"
-						size={24}
-						color={colors.textPrimary}
-					/>
+				<TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+					<Feather name="arrow-left" size={24} color={colors.textPrimary} />
 				</TouchableOpacity>
 				<Text style={styles.headerTitle}>Select Print Shop</Text>
 				<View style={styles.placeholder} />
@@ -93,45 +82,28 @@ const NewPrint = () => {
 
 			{loading ? (
 				<View style={styles.loadingContainer}>
-					<ActivityIndicator
-						size="large"
-						color={colors.primary}
-					/>
+					<ActivityIndicator size="large" color={colors.primary} />
 					<Text style={styles.loadingText}>Loading shops...</Text>
 				</View>
 			) : error ? (
 				<View style={styles.errorContainer}>
-					<Feather
-						name="alert-circle"
-						size={48}
-						color={colors.expense}
-					/>
+					<Feather name="alert-circle" size={48} color={colors.expense} />
 					<Text style={styles.errorText}>{error}</Text>
-					<TouchableOpacity
-						style={styles.retryButton}
-						onPress={fetchShops}>
+					<TouchableOpacity style={styles.retryButton} onPress={fetchShops}>
 						<Text style={styles.retryButtonText}>Retry</Text>
 					</TouchableOpacity>
 				</View>
 			) : shops.length === 0 ? (
 				<View style={styles.emptyContainer}>
-					<Feather
-						name="inbox"
-						size={48}
-						color={colors.textSecondary}
-					/>
+					<Feather name="inbox" size={48} color={colors.textSecondary} />
 					<Text style={styles.emptyText}>No print shops available</Text>
-					<TouchableOpacity
-						style={styles.retryButton}
-						onPress={fetchShops}>
+					<TouchableOpacity style={styles.retryButton} onPress={fetchShops}>
 						<Text style={styles.retryButtonText}>Refresh</Text>
 					</TouchableOpacity>
 				</View>
 			) : (
 				<>
-					<ScrollView
-						style={styles.scrollView}
-						contentContainerStyle={styles.scrollContent}>
+					<ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
 						{shops.map((shop) => {
 							return (
 								<ShopCard
@@ -148,13 +120,10 @@ const NewPrint = () => {
 						<TouchableOpacity
 							style={[styles.continueButton, !selectedShop && styles.continueButtonDisabled]}
 							onPress={handleContinue}
-							disabled={!selectedShop}>
+							disabled={!selectedShop}
+						>
 							<Text style={styles.continueButtonText}>Continue</Text>
-							<Feather
-								name="arrow-right"
-								size={20}
-								color={colors.cardBackground}
-							/>
+							<Feather name="arrow-right" size={20} color={colors.cardBackground} />
 						</TouchableOpacity>
 					</View>
 				</>
@@ -165,16 +134,9 @@ const NewPrint = () => {
 
 const ShopCard = ({ shop, isSelected, onSelect }) => {
 	return (
-		<TouchableOpacity
-			style={[styles.shopCard, isSelected && styles.shopCardSelected]}
-			onPress={onSelect}
-			activeOpacity={0.7}>
+		<TouchableOpacity style={[styles.shopCard, isSelected && styles.shopCardSelected]} onPress={onSelect} activeOpacity={0.7}>
 			<View style={[styles.shopIcon, isSelected && styles.shopIconSelected]}>
-				<Feather
-					name="shopping-bag"
-					size={24}
-					color={isSelected ? colors.printRequest : colors.textSecondary}
-				/>
+				<Feather name="shopping-bag" size={24} color={isSelected ? colors.printRequest : colors.textSecondary} />
 			</View>
 
 			<View style={styles.shopInfo}>
@@ -182,9 +144,7 @@ const ShopCard = ({ shop, isSelected, onSelect }) => {
 				<Text style={styles.shopAddress}>{shop.address}</Text>
 				<View style={styles.capabilities}>
 					{shop.capabilities.map((capability, index) => (
-						<View
-							key={index}
-							style={styles.capabilityItem}>
+						<View key={index} style={styles.capabilityItem}>
 							<Text style={styles.capabilityBullet}>•</Text>
 							<Text style={styles.capabilityText}>{capability}</Text>
 						</View>
@@ -193,11 +153,7 @@ const ShopCard = ({ shop, isSelected, onSelect }) => {
 			</View>
 			{isSelected && (
 				<View style={styles.selectionIndicator}>
-					<Feather
-						name="check-circle"
-						size={24}
-						color={colors.printRequest}
-					/>
+					<Feather name="check-circle" size={24} color={colors.printRequest} />
 				</View>
 			)}
 		</TouchableOpacity>
