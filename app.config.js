@@ -2,7 +2,7 @@ import "dotenv/config";
 export default {
 	expo: {
 		name: "Click Print",
-		slug: "Click Print",
+		slug: "print-management-system-client-app",
 		version: "1.0.0",
 		orientation: "portrait",
 		icon: "./assets/icon.png",

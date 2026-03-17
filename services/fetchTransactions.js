@@ -1,9 +1,7 @@
-// to do in this services
-
-import config from "../config/config";
 import * as SecureStore from "expo-secure-store";
+import config from "../config/config";
 
-const API_BASE_URL = config.apiBaseUrl;	
+const API_BASE_URL = config.apiBaseUrl;
 
 const api = async (url, options = {}) => {
 	const token = await SecureStore.getItemAsync("token");
@@ -26,7 +24,7 @@ const api = async (url, options = {}) => {
 // Fetch all transactions
 export const fetchTransactions = async () => {
 	try {
-		const data = await api("/history");
+		const data = await api("/jobs");
 		return data.data;
 	} catch (error) {
 		console.log("Error fetching transactions:", error);
